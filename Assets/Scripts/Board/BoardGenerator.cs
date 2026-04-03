@@ -7,6 +7,8 @@ namespace DiceGame.Board
 {
     public class BoardGenerator : MonoBehaviour
     {
+        public static BoardGenerator Instance { get; private set; }
+
         [Header("References")]
         [SerializeField] private GameObject tilePrefab;
         [SerializeField] private Transform boardParent;
@@ -18,6 +20,17 @@ namespace DiceGame.Board
         private MapData mapData;
 
         public int TileCount => tiles.Count;
+
+        private void Awake()
+        {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+        }
+
 
         private void Start()
         {

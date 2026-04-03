@@ -639,6 +639,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 114336506}
   m_CullTransparentMesh: 1
+--- !u!1 &294495725
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 294495727}
+  - component: {fileID: 294495726}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &294495726
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 294495725}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ef1adf2b82df304cb7544a02438dc36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boardGenerator: {fileID: 564174458}
+--- !u!4 &294495727
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 294495725}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -1797,7 +1842,7 @@ GameObject:
   - component: {fileID: 1160473693}
   - component: {fileID: 1160473694}
   m_Layer: 5
-  m_Name: Dice Container 1
+  m_Name: Dice Value Container 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2252,8 +2297,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1592891148}
   - component: {fileID: 1592891149}
+  - component: {fileID: 1592891150}
   m_Layer: 5
-  m_Name: Dices
+  m_Name: Dices Values
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2307,6 +2353,21 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &1592891150
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1592891147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f0ec93784b486043be8680287bc148e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  firstDiceInputField: {fileID: 535744635}
+  secondDiceInputField: {fileID: 2127106939}
+  rollButton: {fileID: 1698553508}
 --- !u!1 &1687904080
 GameObject:
   m_ObjectHideFlags: 0
@@ -2703,7 +2764,7 @@ GameObject:
   - component: {fileID: 1917504587}
   - component: {fileID: 1917504588}
   m_Layer: 5
-  m_Name: Dice Container 2
+  m_Name: Dice Value Container 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3431,3 +3492,4 @@ SceneRoots:
   - {fileID: 1134865465}
   - {fileID: 564174459}
   - {fileID: 433383172}
+  - {fileID: 294495727}
