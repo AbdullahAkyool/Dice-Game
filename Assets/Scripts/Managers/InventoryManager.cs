@@ -55,6 +55,8 @@ namespace DiceGame.Managers
                 Fruits[fruitType] = amount;
             }
 
+            EventManager.InventoryEvents.OnUpdateItemUIElement?.Invoke(fruitType, amount);
+
             Debug.Log($"Earned {amount} {fruitType}. Total: {Fruits[fruitType]}");
         }
     }

@@ -8,6 +8,6 @@ namespace DiceGame.Events
     public class InventoryEvents
     {
         public Action<FruitType, int> OnItemAdded;
-        public Action<FruitType, int> OnItemRemoved;
+        public Action<FruitType, int> OnUpdateItemUIElement;
     }
 }

@@ -24,12 +24,12 @@ namespace DiceGame.UI
 
         void OnEnable()
         {
-            EventManager.InventoryEvents.OnItemAdded += IncreaseItemCount;
+            EventManager.InventoryEvents.OnUpdateItemUIElement += IncreaseItemCount;
         }
 
         void OnDisable()
         {
-            EventManager.InventoryEvents.OnItemAdded -= IncreaseItemCount;
+            EventManager.InventoryEvents.OnUpdateItemUIElement -= IncreaseItemCount;
         }
 
         private void SetItemUIElement(FruitType fruitType)
@@ -40,8 +40,9 @@ namespace DiceGame.UI
 
         private void IncreaseItemCount(FruitType fruitType, int amount)
         {
-            if (fruitType != FruitType) return;
+            if (fruitType != this.fruitType) return;
             itemCount += amount;
+            UpdateItemCount();
         }
 
         private void UpdateItemCount()
