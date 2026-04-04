@@ -14,8 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fruits:
   - fruitType: 1
+    fruitIcon: {fileID: 21300000, guid: 12661bd64674cf84b87db69d59a82340, type: 3}
     tileColor: {r: 0.1521811, g: 0.7433963, b: 0, a: 0}
   - fruitType: 2
+    fruitIcon: {fileID: 21300000, guid: 98085e4a98865d94ea0292e73ee042b0, type: 3}
     tileColor: {r: 0.6518684, g: 0.8415094, b: 0, a: 0}
   - fruitType: 3
+    fruitIcon: {fileID: 21300000, guid: 9c5d6d29b825c804bbdd3f92c7dd5e2f, type: 3}
     tileColor: {r: 1, g: 0, b: 0.21340466, a: 0}

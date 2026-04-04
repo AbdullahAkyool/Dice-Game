@@ -6,6 +6,7 @@ namespace DiceGame.Managers
     {
         public static UIEvents UIEvents { get; } = new UIEvents();
         public static DiceEvents DiceEvents { get; } = new DiceEvents();
+        public static InventoryEvents InventoryEvents { get; } = new InventoryEvents();
     }
 }
 

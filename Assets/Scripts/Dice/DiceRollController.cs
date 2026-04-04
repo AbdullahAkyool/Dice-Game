@@ -1,6 +1,7 @@
 using UnityEngine;
 using DiceGame.Managers;
 using DiceGame.Board;
+using DiceGame.Data;
 
 namespace DiceGame.Dice
 {
@@ -32,6 +33,8 @@ namespace DiceGame.Dice
 
             int targetTileIndex = CalculateTargetTile(total);
 
+            CheckEarnableRewards();
+
             LogRollResult(diceValues, total, targetTileIndex);
         }
 
@@ -59,6 +62,25 @@ namespace DiceGame.Dice
             currentTileIndex = wrappedIndex;
 
             return wrappedIndex;
+        }
+
+        private void CheckEarnableRewards()
+        {
+            if (boardGenerator == null)
+            {
+                boardGenerator = BoardGenerator.Instance;
+            }
+
+            Tile targetTile = boardGenerator.GetTile(currentTileIndex);
+            if (targetTile == null) return;
+
+            if (targetTile.TileData.HasReward)
+            {
+                int fruitCount = targetTile.TileData.amount;
+                FruitType fruitType = targetTile.TileData.FruitTypeEnum;
+
+                EventManager.InventoryEvents.OnItemAdded?.Invoke(fruitType, fruitCount);
+            }
         }
 
         private void LogRollResult(int[] diceValues, int total, int targetTileIndex)
