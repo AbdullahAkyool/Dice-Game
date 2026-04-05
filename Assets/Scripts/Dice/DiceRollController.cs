@@ -19,6 +19,8 @@ namespace DiceGame.Dice
 
         private void OnEnable()
         {
+            EventManager.InventoryEvents.OnCheckEarnableRewards += CheckEarnableRewards;
+
             EventManager.DiceEvents.OnDiceValuesEntered += HandleDiceValuesEntered;
             EventManager.DiceEvents.OnDiceRollingStarted += StartDiceRolling;
             EventManager.DiceEvents.OnDiceRollingFinished += CheckDicesCompeted;
@@ -26,6 +28,8 @@ namespace DiceGame.Dice
 
         private void OnDisable()
         {
+            EventManager.InventoryEvents.OnCheckEarnableRewards -= CheckEarnableRewards;
+
             EventManager.DiceEvents.OnDiceValuesEntered -= HandleDiceValuesEntered;
             EventManager.DiceEvents.OnDiceRollingStarted -= StartDiceRolling;
             EventManager.DiceEvents.OnDiceRollingFinished -= CheckDicesCompeted;
@@ -62,14 +66,6 @@ namespace DiceGame.Dice
             {
                 diceController.RollToCurrentTarget();
             }
-
-            int total = CalculateTotal(tempDiceValues);
-
-            int targetTileIndex = CalculateTargetTile(total);
-
-            CheckEarnableRewards();
-
-            LogRollResult(tempDiceValues, total, targetTileIndex);
         }
 
         private int CalculateTotal(int[] diceValues)
@@ -102,12 +98,12 @@ namespace DiceGame.Dice
         {
             diceCompetedCount++;
 
-            if(diceCompetedCount >= diceControllers.Count)
+            if (diceCompetedCount >= diceControllers.Count)
             {
                 diceCompetedCount = 0;
                 EventManager.CameraEvents.OnSwitchToPlayerCamera?.Invoke();
                 return;
-            }            
+            }
         }
 
         private void CheckEarnableRewards()
@@ -127,6 +123,12 @@ namespace DiceGame.Dice
 
                 EventManager.InventoryEvents.OnItemAdded?.Invoke(fruitType, fruitCount);
             }
+
+            int total = CalculateTotal(tempDiceValues);
+
+            int targetTileIndex = CalculateTargetTile(total);
+
+            LogRollResult(tempDiceValues, total, targetTileIndex);
         }
 
         private void LogRollResult(int[] diceValues, int total, int targetTileIndex)

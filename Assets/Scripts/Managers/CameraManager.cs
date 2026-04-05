@@ -54,6 +54,8 @@ namespace DiceGame.Managers
                 b => b.From == diceCamera.name && b.To == playerCamera.name);
 
             yield return new WaitForSeconds(blendIndex >= 0 ? blenderSettings.CustomBlends[blendIndex].Blend.Time + .5f : 1.5f);
+
+            EventManager.InventoryEvents.OnCheckEarnableRewards?.Invoke();
         }
 
         private IEnumerator HandleSwitchToDiceCameraCO()
