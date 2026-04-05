@@ -2,6 +2,7 @@ using UnityEngine;
 using DiceGame.Managers;
 using DiceGame.Board;
 using DiceGame.Data;
+using System.Collections.Generic;
 
 namespace DiceGame.Dice
 {
@@ -12,14 +13,22 @@ namespace DiceGame.Dice
 
         private int currentTileIndex = 0;
 
+        private int[] tempDiceValues;
+        [SerializeField] private List<DiceController> diceControllers;
+        private int diceCompetedCount = 0;
+
         private void OnEnable()
         {
             EventManager.DiceEvents.OnDiceValuesEntered += HandleDiceValuesEntered;
+            EventManager.DiceEvents.OnDiceRollingStarted += StartDiceRolling;
+            EventManager.DiceEvents.OnDiceRollingFinished += CheckDicesCompeted;
         }
 
         private void OnDisable()
         {
             EventManager.DiceEvents.OnDiceValuesEntered -= HandleDiceValuesEntered;
+            EventManager.DiceEvents.OnDiceRollingStarted -= StartDiceRolling;
+            EventManager.DiceEvents.OnDiceRollingFinished -= CheckDicesCompeted;
         }
 
         private void Start()
@@ -29,13 +38,38 @@ namespace DiceGame.Dice
 
         private void HandleDiceValuesEntered(int[] diceValues)
         {
-            int total = CalculateTotal(diceValues);
+            tempDiceValues = diceValues;
+            if (diceControllers == null) return;
+
+            for (int i = 0; i < diceControllers.Count; i++)
+            {
+                if (i < diceValues.Length)
+                {
+                    diceControllers[i].TargetFaceValue = diceValues[i];
+                }
+            }
+
+            EventManager.CameraEvents.OnSwitchToDiceCamera?.Invoke();
+
+        }
+
+        private void StartDiceRolling()
+        {
+            if (diceControllers == null) return;
+            if (tempDiceValues == null) return;
+
+            foreach (DiceController diceController in diceControllers)
+            {
+                diceController.RollToCurrentTarget();
+            }
+
+            int total = CalculateTotal(tempDiceValues);
 
             int targetTileIndex = CalculateTargetTile(total);
 
             CheckEarnableRewards();
 
-            LogRollResult(diceValues, total, targetTileIndex);
+            LogRollResult(tempDiceValues, total, targetTileIndex);
         }
 
         private int CalculateTotal(int[] diceValues)
@@ -62,6 +96,18 @@ namespace DiceGame.Dice
             currentTileIndex = wrappedIndex;
 
             return wrappedIndex;
+        }
+
+        private void CheckDicesCompeted()
+        {
+            diceCompetedCount++;
+
+            if(diceCompetedCount >= diceControllers.Count)
+            {
+                diceCompetedCount = 0;
+                EventManager.CameraEvents.OnSwitchToPlayerCamera?.Invoke();
+                return;
+            }            
         }
 
         private void CheckEarnableRewards()
@@ -91,7 +137,7 @@ namespace DiceGame.Dice
             }
 
             string diceValuesStr = string.Join(" + ", diceValues);
-            
+
             Tile targetTile = boardGenerator.GetTile(targetTileIndex);
             string tileInfo = targetTile != null ? $"Tile {targetTileIndex}" : "Unknown Tile";
 

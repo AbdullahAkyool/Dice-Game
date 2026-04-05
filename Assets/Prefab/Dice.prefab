@@ -42,7 +42,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5307439110975991191}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 041d9b186260cd445942d56ae860d36c, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -95,24 +95,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e19c644ed59def048816cf39eee3e8e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetFaceValue: 1
-  spawnPoint: {fileID: 0}
-  spawnWorldPosition: {x: 0, y: 8, z: 0}
-  downwardForce: 12
-  horizontalRandomImpulse: 0.35
-  torqueStrength: 18
+  landingWorldPosition: {x: 0, y: 0.75, z: 15}
+  cornerTiltAngle: 28
+  dropDuration: 0.5
+  spinMultiplier: 2
+  bounceDuration: 0.3
+  bounceHeight: 0.6
   faceUpEulerAngles:
-  - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: -90}
   - {x: -90, y: 0, z: 0}
-  - {x: 90, y: 0, z: 0}
-  - {x: 0, y: 0, z: 90}
   - {x: 180, y: 0, z: 0}
-  settleVelocityThreshold: 0.02
-  settleAngularThreshold: 0.05
-  maxRollTime: 6
-  snapDuration: 0.12
-  rollOnPlay: 1
+  - {x: 0, y: 0, z: -90}
+  - {x: 0, y: 0, z: 90}
+  - {x: 0, y: 0, z: 0}
+  - {x: 90, y: 0, z: 0}
 --- !u!1001 &8317363211615892966
 PrefabInstance:
   m_ObjectHideFlags: 0

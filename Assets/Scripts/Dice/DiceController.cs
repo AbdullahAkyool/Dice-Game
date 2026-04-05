@@ -1,4 +1,5 @@
 using System.Collections;
+using DiceGame.Managers;
 using UnityEngine;
 
 namespace DiceGame.Dice
@@ -8,10 +9,10 @@ namespace DiceGame.Dice
         private const float DefaultSpawnHeightAboveLanding = 5f;
 
         [Header("Target")]
-        [SerializeField, Range(1, 6)] private int targetFaceValue = 1;
+        private int targetFaceValue;
+        public int TargetFaceValue { get => targetFaceValue; set => targetFaceValue = value; }
 
         [Header("Spawn")]
-        [SerializeField] private Transform spawnPoint;
         [SerializeField] private Vector3 landingWorldPosition;
         [SerializeField, Range(5f, 60f)] private float cornerTiltAngle = 28f;
 
@@ -33,11 +34,6 @@ namespace DiceGame.Dice
         {
             rb = GetComponent<Rigidbody>();
             rb.isKinematic = true;
-        }
-
-        private void Start()
-        {
-            RollToCurrentTarget();
         }
 
         [ContextMenu("Roll To Current Target")]
@@ -86,13 +82,13 @@ namespace DiceGame.Dice
 
             rb.isKinematic = true;
             rollRoutine = null;
+
+            EventManager.DiceEvents.OnDiceRollingFinished?.Invoke();
         }
 
         private Vector3 GetSpawnWorldPosition()
         {
-            return spawnPoint != null
-                ? spawnPoint.position
-                : landingWorldPosition + Vector3.up * DefaultSpawnHeightAboveLanding;
+            return landingWorldPosition + Vector3.up * DefaultSpawnHeightAboveLanding;
         }
 
         private Quaternion MultiplyRandomSpin(Quaternion baseRot)

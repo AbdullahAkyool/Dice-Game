@@ -6,5 +6,7 @@ namespace DiceGame.Events
     public class DiceEvents
     {
         public Action<int[]> OnDiceValuesEntered;
+        public Action OnDiceRollingStarted;
+        public Action OnDiceRollingFinished;
     }
 }
