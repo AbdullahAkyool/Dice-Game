@@ -68,7 +68,7 @@ namespace DiceGame.Board
 
         public Vector3 GetPlayerPosition()
         {
-            return transform.position + Vector3.up * 0.5f;
+            return transform.position + Vector3.up * 1.5f;
         }
     }
 }

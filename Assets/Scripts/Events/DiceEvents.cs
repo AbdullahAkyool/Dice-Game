@@ -8,5 +8,7 @@ namespace DiceGame.Events
         public Action<int[]> OnDiceValuesEntered;
         public Action OnDiceRollingStarted;
         public Action OnDiceRollingFinished;
+        public Action<int> OnPlayerMoveRequested;
+        public Action OnPlayerMovementCompleted;
     }
 }

@@ -55,7 +55,7 @@ namespace DiceGame.Managers
 
             yield return new WaitForSeconds(blendIndex >= 0 ? blenderSettings.CustomBlends[blendIndex].Blend.Time + .5f : 1.5f);
 
-            EventManager.InventoryEvents.OnCheckEarnableRewards?.Invoke();
+            EventManager.CameraEvents.OnPlayerCameraTransitionCompleted?.Invoke();
         }
 
         private IEnumerator HandleSwitchToDiceCameraCO()

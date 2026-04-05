@@ -12,6 +12,7 @@ namespace DiceGame.Dice
         private BoardGenerator boardGenerator;
 
         private int currentTileIndex = 0;
+        private int pendingTargetTileIndex = 0;
 
         private int[] tempDiceValues;
         [SerializeField] private List<DiceController> diceControllers;
@@ -24,6 +25,8 @@ namespace DiceGame.Dice
             EventManager.DiceEvents.OnDiceValuesEntered += HandleDiceValuesEntered;
             EventManager.DiceEvents.OnDiceRollingStarted += StartDiceRolling;
             EventManager.DiceEvents.OnDiceRollingFinished += CheckDicesCompeted;
+            EventManager.DiceEvents.OnPlayerMovementCompleted += HandlePlayerMovementCompleted;
+            EventManager.CameraEvents.OnPlayerCameraTransitionCompleted += HandlePlayerCameraTransitionCompleted;
         }
 
         private void OnDisable()
@@ -33,6 +36,8 @@ namespace DiceGame.Dice
             EventManager.DiceEvents.OnDiceValuesEntered -= HandleDiceValuesEntered;
             EventManager.DiceEvents.OnDiceRollingStarted -= StartDiceRolling;
             EventManager.DiceEvents.OnDiceRollingFinished -= CheckDicesCompeted;
+            EventManager.DiceEvents.OnPlayerMovementCompleted -= HandlePlayerMovementCompleted;
+            EventManager.CameraEvents.OnPlayerCameraTransitionCompleted -= HandlePlayerCameraTransitionCompleted;
         }
 
         private void Start()
@@ -78,7 +83,7 @@ namespace DiceGame.Dice
             return total;
         }
 
-        private int CalculateTargetTile(int steps)
+        private int CalculateTargetTileIndex(int steps)
         {
             if (boardGenerator == null)
             {
@@ -86,12 +91,7 @@ namespace DiceGame.Dice
             }
 
             int newIndex = currentTileIndex + steps;
-
-            int wrappedIndex = boardGenerator.GetWrappedIndex(newIndex);
-
-            currentTileIndex = wrappedIndex;
-
-            return wrappedIndex;
+            return boardGenerator.GetWrappedIndex(newIndex);
         }
 
         private void CheckDicesCompeted()
@@ -123,12 +123,33 @@ namespace DiceGame.Dice
 
                 EventManager.InventoryEvents.OnItemAdded?.Invoke(fruitType, fruitCount);
             }
+        }
+
+        private void HandlePlayerCameraTransitionCompleted()
+        {
+            if (tempDiceValues == null || tempDiceValues.Length == 0)
+            {
+                return;
+            }
 
             int total = CalculateTotal(tempDiceValues);
+            pendingTargetTileIndex = CalculateTargetTileIndex(total);
 
-            int targetTileIndex = CalculateTargetTile(total);
+            EventManager.DiceEvents.OnPlayerMoveRequested?.Invoke(pendingTargetTileIndex);
+        }
 
-            LogRollResult(tempDiceValues, total, targetTileIndex);
+        private void HandlePlayerMovementCompleted()
+        {
+            if (tempDiceValues == null || tempDiceValues.Length == 0)
+            {
+                return;
+            }
+
+            int total = CalculateTotal(tempDiceValues);
+            currentTileIndex = pendingTargetTileIndex;
+
+            LogRollResult(tempDiceValues, total, currentTileIndex);
+            CheckEarnableRewards();
         }
 
         private void LogRollResult(int[] diceValues, int total, int targetTileIndex)
@@ -154,6 +175,7 @@ namespace DiceGame.Dice
         public void ResetPosition()
         {
             currentTileIndex = 0;
+            pendingTargetTileIndex = 0;
             Debug.Log("Player position reset to tile 0");
         }
     }
