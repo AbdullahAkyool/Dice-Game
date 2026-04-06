@@ -7,12 +7,19 @@ namespace DiceGame.Player
 {
     public class PlayerController : MonoBehaviour
     {
+        private PlayerAnimatorController animatorController;
+
         [Header("Movement Settings")]
         [SerializeField] private float moveLerpSpeed = 4f;
         [SerializeField] private float stopDistance = 0.01f;
 
         private BoardGenerator boardGenerator;
         private Coroutine movementCoroutine;
+
+        void Awake()
+        {
+            animatorController = GetComponent<PlayerAnimatorController>();
+        }
 
         private void OnEnable()
         {
@@ -27,6 +34,7 @@ namespace DiceGame.Player
         private void Start()
         {
             boardGenerator = BoardGenerator.Instance;
+            animatorController.IdleAnimation();
         }
 
         private void HandlePlayerMoveRequested(int targetTileIndex)
@@ -59,6 +67,8 @@ namespace DiceGame.Player
             targetPosition.x = transform.position.x;
             targetPosition.y = transform.position.y;
 
+            animatorController.RunAnimation();
+
             while (Mathf.Abs(targetPosition.z - transform.position.z) > stopDistance)
             {
                 float nextZ = Mathf.Lerp(transform.position.z, targetPosition.z, moveLerpSpeed * Time.deltaTime);
@@ -69,11 +79,14 @@ namespace DiceGame.Player
                 yield return null;
             }
 
+            animatorController.IdleAnimation();
+
             Vector3 finalPosition = transform.position;
             finalPosition.z = targetPosition.z;
             transform.position = finalPosition;
 
             movementCoroutine = null;
+
             EventManager.DiceEvents.OnPlayerMovementCompleted?.Invoke();
         }
     }
