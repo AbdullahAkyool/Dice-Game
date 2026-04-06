@@ -28,12 +28,14 @@ namespace DiceGame.Managers
         {
             EventManager.CameraEvents.OnSwitchToDiceCamera += HandleSwitchToDiceCamera;
             EventManager.CameraEvents.OnSwitchToPlayerCamera += HandleSwitchToPlayerCamera;
+            EventManager.CameraEvents.OnSnapToPlayerCameraImmediate += SnapToPlayerCameraImmediate;
         }
 
         private void OnDisable()
         {
             EventManager.CameraEvents.OnSwitchToDiceCamera -= HandleSwitchToDiceCamera;
             EventManager.CameraEvents.OnSwitchToPlayerCamera -= HandleSwitchToPlayerCamera;
+            EventManager.CameraEvents.OnSnapToPlayerCameraImmediate -= SnapToPlayerCameraImmediate;
         }
 
         private void HandleSwitchToPlayerCamera()
@@ -44,6 +46,19 @@ namespace DiceGame.Managers
         private void HandleSwitchToDiceCamera()
         {
             StartCoroutine(HandleSwitchToDiceCameraCO());
+        }
+        private void SnapToPlayerCameraImmediate()
+        {
+            StopAllCoroutines();
+            if (playerCamera != null)
+            {
+                playerCamera.enabled = true;
+            }
+
+            if (diceCamera != null)
+            {
+                diceCamera.enabled = false;
+            }
         }
         private IEnumerator HandleSwitchToPlayerCameraCO()
         {

@@ -29,11 +29,25 @@ namespace DiceGame.Dice
 
         private Rigidbody rb;
         private Coroutine rollRoutine;
+        private Quaternion initialRotation;
 
         private void Awake()
         {
             rb = GetComponent<Rigidbody>();
             rb.isKinematic = true;
+            initialRotation = transform.rotation;
+        }
+
+        private void OnEnable()
+        {
+            EventManager.DiceEvents.OnStopGameplayActivities += ResetRollState;
+            EventManager.DiceEvents.OnResetGameplayState += ResetRollState;
+        }
+
+        private void OnDisable()
+        {
+            EventManager.DiceEvents.OnStopGameplayActivities -= ResetRollState;
+            EventManager.DiceEvents.OnResetGameplayState -= ResetRollState;
         }
 
         [ContextMenu("Roll To Current Target")]
@@ -52,6 +66,27 @@ namespace DiceGame.Dice
                 StopCoroutine(rollRoutine);
 
             rollRoutine = StartCoroutine(RollRoutine());
+        }
+
+        private void ResetRollState()
+        {
+            if (rollRoutine != null)
+            {
+                StopCoroutine(rollRoutine);
+                rollRoutine = null;
+            }
+
+            if (rb == null)
+            {
+                return;
+            }
+
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.isKinematic = true;
+            rb.MovePosition(landingWorldPosition);
+            rb.MoveRotation(initialRotation);
+            transform.SetPositionAndRotation(landingWorldPosition, initialRotation);
         }
 
         private IEnumerator RollRoutine()

@@ -20,6 +20,7 @@ namespace DiceGame.Board
         private MapData mapData;
 
         public int TileCount => tiles.Count;
+        public int CurrentLevelIndex => levelIndex;
 
         private void Awake()
         {
@@ -31,9 +32,9 @@ namespace DiceGame.Board
             Instance = this;
         }
 
-
-        private void Start()
+        public void BuildLevel(int index) // Loads JSON from LevelDatabase for this index
         {
+            levelIndex = index;
             LoadMapData();
             GenerateBoard();
         }

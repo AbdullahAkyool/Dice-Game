@@ -21,6 +21,18 @@ namespace DiceGame.Managers
             InitializeFruitSlots();
         }
 
+        private void OnEnable()
+        {
+            EventManager.InventoryEvents.OnInventoryReset += ResetInventory;
+            EventManager.InventoryEvents.OnItemAdded += HandleItemAdded;
+        }
+
+        private void OnDisable()
+        {
+            EventManager.InventoryEvents.OnInventoryReset -= ResetInventory;
+            EventManager.InventoryEvents.OnItemAdded -= HandleItemAdded;
+        }
+
         private void InitializeFruitSlots()
         {
             Fruits.Clear();
@@ -28,19 +40,15 @@ namespace DiceGame.Managers
             {
                 if (type == FruitType.None) continue;
                 Fruits[type] = 0;
+
+                EventManager.InventoryEvents.OnUpdateItemUIElement?.Invoke(type, 0);
             }
         }
 
-        void OnEnable()
+        private void ResetInventory()
         {
-            EventManager.InventoryEvents.OnItemAdded += HandleItemAdded;
+            InitializeFruitSlots();
         }
-
-        void OnDisable()
-        {
-            EventManager.InventoryEvents.OnItemAdded -= HandleItemAdded;
-        }
-
         private void HandleItemAdded(FruitType fruitType, int amount)
         {
             if (amount <= 0) return;

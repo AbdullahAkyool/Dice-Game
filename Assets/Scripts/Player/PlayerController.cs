@@ -23,12 +23,16 @@ namespace DiceGame.Player
 
         private void OnEnable()
         {
-            EventManager.DiceEvents.OnPlayerMoveRequested += HandlePlayerMoveRequested;
+            EventManager.PlayerEvents.OnPlayerMoveRequested += HandlePlayerMoveRequested;
+            EventManager.PlayerEvents.OnStopPlayerMovementRequested += StopCurrentMovement;
+            EventManager.PlayerEvents.OnResetPlayerPositionRequested += ResetToStartTile;
         }
 
         private void OnDisable()
         {
-            EventManager.DiceEvents.OnPlayerMoveRequested -= HandlePlayerMoveRequested;
+            EventManager.PlayerEvents.OnPlayerMoveRequested -= HandlePlayerMoveRequested;
+            EventManager.PlayerEvents.OnStopPlayerMovementRequested -= StopCurrentMovement;
+            EventManager.PlayerEvents.OnResetPlayerPositionRequested -= ResetToStartTile;
         }
 
         private void Start()
@@ -59,7 +63,7 @@ namespace DiceGame.Player
             {
                 Debug.LogWarning($"Target tile {targetTileIndex} not found.");
                 movementCoroutine = null;
-                EventManager.DiceEvents.OnPlayerMovementCompleted?.Invoke();
+                EventManager.PlayerEvents.OnPlayerMovementCompleted?.Invoke();
                 yield break;
             }
 
@@ -87,7 +91,43 @@ namespace DiceGame.Player
 
             movementCoroutine = null;
 
-            EventManager.DiceEvents.OnPlayerMovementCompleted?.Invoke();
+            EventManager.PlayerEvents.OnPlayerMovementCompleted?.Invoke();
+        }
+
+        private void StopCurrentMovement()
+        {
+            if (movementCoroutine == null)
+            {
+                return;
+            }
+
+            StopCoroutine(movementCoroutine);
+            movementCoroutine = null;
+            animatorController.IdleAnimation();
+        }
+
+        private void ResetToStartTile()
+        {
+            StopCurrentMovement();
+
+            if (boardGenerator == null)
+            {
+                boardGenerator = BoardGenerator.Instance;
+            }
+
+            Tile startTile = boardGenerator != null ? boardGenerator.GetTile(0) : null;
+            if (startTile == null)
+            {
+                Debug.LogWarning("ResetToStartTile: tile 0 not found.");
+                return;
+            }
+
+            Vector3 targetPosition = startTile.GetPlayerPosition();
+            targetPosition.x = transform.position.x;
+            targetPosition.y = transform.position.y;
+            transform.position = targetPosition;
+
+            animatorController.IdleAnimation();
         }
     }
 }

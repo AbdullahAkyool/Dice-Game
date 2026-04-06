@@ -25,8 +25,12 @@ namespace DiceGame.Dice
             EventManager.DiceEvents.OnDiceValuesEntered += HandleDiceValuesEntered;
             EventManager.DiceEvents.OnDiceRollingStarted += StartDiceRolling;
             EventManager.DiceEvents.OnDiceRollingFinished += CheckDicesCompeted;
-            EventManager.DiceEvents.OnPlayerMovementCompleted += HandlePlayerMovementCompleted;
+            EventManager.DiceEvents.OnStopGameplayActivities += StopActiveGameplay;
+            EventManager.PlayerEvents.OnPlayerMovementCompleted += HandlePlayerMovementCompleted;
             EventManager.CameraEvents.OnPlayerCameraTransitionCompleted += HandlePlayerCameraTransitionCompleted;
+
+            EventManager.DiceEvents.OnResetGameplayState += ResetGameplayState;
+
         }
 
         private void OnDisable()
@@ -36,8 +40,11 @@ namespace DiceGame.Dice
             EventManager.DiceEvents.OnDiceValuesEntered -= HandleDiceValuesEntered;
             EventManager.DiceEvents.OnDiceRollingStarted -= StartDiceRolling;
             EventManager.DiceEvents.OnDiceRollingFinished -= CheckDicesCompeted;
-            EventManager.DiceEvents.OnPlayerMovementCompleted -= HandlePlayerMovementCompleted;
+            EventManager.DiceEvents.OnStopGameplayActivities -= StopActiveGameplay;
+            EventManager.PlayerEvents.OnPlayerMovementCompleted -= HandlePlayerMovementCompleted;
             EventManager.CameraEvents.OnPlayerCameraTransitionCompleted -= HandlePlayerCameraTransitionCompleted;
+
+            EventManager.DiceEvents.OnResetGameplayState -= ResetGameplayState;
         }
 
         private void Start()
@@ -96,6 +103,16 @@ namespace DiceGame.Dice
 
         private void CheckDicesCompeted()
         {
+            if (tempDiceValues == null || tempDiceValues.Length == 0)
+            {
+                return;
+            }
+
+            if (diceControllers == null || diceControllers.Count == 0)
+            {
+                return;
+            }
+
             diceCompetedCount++;
 
             if (diceCompetedCount >= diceControllers.Count)
@@ -135,7 +152,7 @@ namespace DiceGame.Dice
             int total = CalculateTotal(tempDiceValues);
             pendingTargetTileIndex = CalculateTargetTileIndex(total);
 
-            EventManager.DiceEvents.OnPlayerMoveRequested?.Invoke(pendingTargetTileIndex);
+            EventManager.PlayerEvents.OnPlayerMoveRequested?.Invoke(pendingTargetTileIndex);
         }
 
         private void HandlePlayerMovementCompleted()
@@ -150,6 +167,7 @@ namespace DiceGame.Dice
 
             LogRollResult(tempDiceValues, total, currentTileIndex);
             CheckEarnableRewards();
+            tempDiceValues = null;
         }
 
         private void LogRollResult(int[] diceValues, int total, int targetTileIndex)
@@ -172,11 +190,19 @@ namespace DiceGame.Dice
             Debug.Log($"<color=cyan>Dice Roll: [{diceValuesStr}] = {total} → Landed on {tileInfo}</color>");
         }
 
-        public void ResetPosition()
+        public void ResetGameplayState()
         {
             currentTileIndex = 0;
             pendingTargetTileIndex = 0;
-            Debug.Log("Player position reset to tile 0");
+            diceCompetedCount = 0;
+            tempDiceValues = null;
+        }
+
+        private void StopActiveGameplay()
+        {
+            pendingTargetTileIndex = currentTileIndex;
+            diceCompetedCount = 0;
+            tempDiceValues = null;
         }
     }
 }

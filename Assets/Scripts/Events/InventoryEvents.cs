@@ -10,5 +10,6 @@ namespace DiceGame.Events
         public Action OnCheckEarnableRewards;
         public Action<FruitType, int> OnItemAdded;
         public Action<FruitType, int> OnUpdateItemUIElement;
+        public Action OnInventoryReset;
     }
 }

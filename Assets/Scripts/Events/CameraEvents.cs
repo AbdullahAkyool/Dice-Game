@@ -9,5 +9,6 @@ namespace DiceGame.Events
         public Action OnSwitchToPlayerCamera;
         public Action OnSwitchToDiceCamera;
         public Action OnPlayerCameraTransitionCompleted;
+        public Action OnSnapToPlayerCameraImmediate;
     }
 }

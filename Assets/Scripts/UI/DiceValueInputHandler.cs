@@ -1,4 +1,5 @@
 using TMPro;
+using DiceGame.GameFlow;
 using UnityEngine;
 using UnityEngine.UI;
 using DiceGame.Managers;
@@ -16,6 +17,15 @@ namespace DiceGame.UI
         private const string VALID_CHARACTERS = "123456";
         private const int MIN_DICE_VALUE = 1;
         private const int MAX_DICE_VALUE = 6;
+
+        void OnEnable()
+        {
+            EventManager.DiceEvents.OnClearDiceInputs += ClearInputFields;
+        }
+        void OnDisable()
+        {
+            EventManager.DiceEvents.OnClearDiceInputs -= ClearInputFields;
+        }
 
         private void Start()
         {
@@ -112,6 +122,12 @@ namespace DiceGame.UI
 
         private void OnRollButtonClicked()
         {
+            if (GameFlowController.Instance != null &&
+                GameFlowController.Instance.CurrentState != GameFlowState.Gameplay)
+            {
+                return;
+            }
+
             if (!TryGetDiceValues(out int[] diceValues)) // dicesValues will assign in TryGetDiceValues method
             {
                 Debug.LogWarning("Please enter valid dice values (1-6) in both fields!");
