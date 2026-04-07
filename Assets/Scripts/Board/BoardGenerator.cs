@@ -10,7 +10,6 @@ namespace DiceGame.Board
         public static BoardGenerator Instance { get; private set; }
 
         [Header("References")]
-        [SerializeField] private GameObject tilePrefab;
         [SerializeField] private Transform boardParent;
 
         [Header("Board Settings")]
@@ -81,33 +80,27 @@ namespace DiceGame.Board
 
         private void CreateTile(TileData tileData, int index)
         {
-            if (tilePrefab == null)
+            if (DatabaseManager.Instance == null)
             {
-                Debug.LogError("Tile prefab is not assigned!");
+                Debug.LogError("DatabaseManager instance not found");
                 return;
             }
 
-            Vector3 position = CalculateTilePosition(index);
-            GameObject tileObject = Instantiate(tilePrefab, position, Quaternion.identity, boardParent);
-            tileObject.name = $"Tile_{index}";
-
-            Tile tile = tileObject.GetComponent<Tile>();
-            if (tile != null)
+            Tile spawnedTile = SimplePoolManager.Instance.Spawn<Tile>(PoolKey.Tile);
+            if (spawnedTile != null)
             {
-                tile.Initialize(tileData);
-                tiles.Add(tile);
+                Vector3 position = new Vector3(0, 0, index * spawnedTile.transform.localScale.z);
+                spawnedTile.name = $"Tile_{index}";
+                spawnedTile.Initialize(tileData);
+                spawnedTile.transform.position = position;
+                spawnedTile.transform.rotation = Quaternion.identity;
+                spawnedTile.transform.SetParent(boardParent, false);
+                tiles.Add(spawnedTile);
             }
             else
             {
-                Debug.LogError($"Tile prefab is missing Tile component!");
-                Destroy(tileObject);
+                Debug.LogError("Failed to spawn tile");
             }
-        }
-
-        private Vector3 CalculateTilePosition(int index)
-        {
-            float spacing = tilePrefab.transform.localScale.z;
-            return new Vector3(0, 0, index * spacing);
         }
 
         private void ClearExistingTiles()
@@ -116,7 +109,14 @@ namespace DiceGame.Board
             {
                 if (tile != null)
                 {
-                    Destroy(tile.gameObject);
+                    if(SimplePoolManager.Instance == null)
+                    {
+                        Debug.LogError("SimplePoolManager instance not found");
+                        Destroy(tile.gameObject);
+                        return;
+                    }
+                    
+                    SimplePoolManager.Instance.Despawn(PoolKey.Tile, tile);
                 }
             }
             tiles.Clear();

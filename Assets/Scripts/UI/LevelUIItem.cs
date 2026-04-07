@@ -1,12 +1,13 @@
 using DiceGame.Data;
 using DiceGame.Managers;
+using DiceGame.Pooling;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace DiceGame.UI
 {
-    public class LevelUIItem : MonoBehaviour
+    public class LevelUIItem : MonoBehaviour, IPoolable
     {
         [SerializeField] private Button button;
         [SerializeField] private TMP_Text titleLabel;
@@ -43,6 +44,16 @@ namespace DiceGame.UI
             }
         }
 
+        private void Reset()
+        {
+            if (titleLabel != null)
+            {
+                titleLabel.text = "";
+            }
+            
+            levelData = null;
+        }
+
         private void OnClicked()
         {
             if (levelData == null)
@@ -52,6 +63,17 @@ namespace DiceGame.UI
             }
 
             EventManager.GameFlowEvents.OnLevelSelectedRequested?.Invoke(levelData.levelIndex);
+        }
+
+        public void OnSpawn()
+        {
+            gameObject.SetActive(true);
+        }
+
+        public void OnDespawn()
+        {
+            Reset();
+            gameObject.SetActive(false);
         }
     }
 }

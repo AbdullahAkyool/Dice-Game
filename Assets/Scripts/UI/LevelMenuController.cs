@@ -7,13 +7,12 @@ namespace DiceGame.UI
     public class LevelMenuController : MonoBehaviour
     {
         [SerializeField] private RectTransform itemContainer;
-        [SerializeField] private LevelUIItem itemPrefab;
 
         private void Start()
         {
-            if (itemContainer == null || itemPrefab == null)
+            if (SimplePoolManager.Instance == null)
             {
-                Debug.LogError("LevelMenuController: assign item container and item prefab.");
+                Debug.LogError("LevelMenuController: SimplePoolManager instance not found.");
                 return;
             }
 
@@ -39,7 +38,8 @@ namespace DiceGame.UI
                     continue;
                 }
 
-                LevelUIItem item = Instantiate(itemPrefab, itemContainer);
+                LevelUIItem item = SimplePoolManager.Instance.Spawn<LevelUIItem>(PoolKey.LevelUIItem);
+                item.transform.SetParent(itemContainer, false);
                 item.Initialize(data, BuildTitle(data));
             }
         }
@@ -58,7 +58,11 @@ namespace DiceGame.UI
         {
             for (int i = itemContainer.childCount - 1; i >= 0; i--)
             {
-                Destroy(itemContainer.GetChild(i).gameObject);
+                LevelUIItem item = itemContainer.GetChild(i).GetComponent<LevelUIItem>();
+                if (item != null)
+                {
+                    SimplePoolManager.Instance.Despawn(PoolKey.LevelUIItem, item);
+                }
             }
         }
     }

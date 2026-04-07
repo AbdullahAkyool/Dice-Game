@@ -14,6 +14,9 @@ namespace DiceGame.Managers
         [SerializeField] private LevelDatabase levelDatabase;
         public LevelDatabase LevelDatabase => levelDatabase;
 
+        [SerializeField] private PoolObjectsDatabaseSO poolObjectsDatabase;
+        public PoolObjectsDatabaseSO PoolObjectsDatabase => poolObjectsDatabase;
+
         private void Awake()
         {
             if (Instance != null && Instance != this)

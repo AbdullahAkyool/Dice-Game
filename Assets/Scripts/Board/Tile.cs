@@ -1,11 +1,12 @@
 using DiceGame.Data;
 using DiceGame.Managers;
+using DiceGame.Pooling;
 using TMPro;
 using UnityEngine;
 
 namespace DiceGame.Board
 {
-    public class Tile : MonoBehaviour
+    public class Tile : MonoBehaviour , IPoolable
     {
         [Header("References")]
         [SerializeField] private TMP_Text tileNumberText;
@@ -55,6 +56,19 @@ namespace DiceGame.Board
             }
         }
 
+        private void Reset()
+        {
+            if (meshRenderer != null)
+            {
+                meshRenderer.material.color = Color.white;
+            }
+
+            if (rewardText != null)
+            {
+                rewardText.text = "";
+            }
+        }
+
         private string GetFruitName(FruitType fruitType)
         {
             return fruitType switch
@@ -69,6 +83,17 @@ namespace DiceGame.Board
         public Vector3 GetPlayerPosition()
         {
             return transform.position + Vector3.up * 1.5f;
+        }
+
+        public void OnSpawn()
+        {
+            gameObject.SetActive(true);
+        }
+
+        public void OnDespawn()
+        {
+            Reset();
+            gameObject.SetActive(false);
         }
     }
 }
