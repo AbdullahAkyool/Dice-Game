@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using DiceGame.Data;
 using DiceGame.Managers;
+using DiceGame.Fruit;
 
 namespace DiceGame.Board
 {
@@ -16,7 +17,8 @@ namespace DiceGame.Board
         [Header("Board Settings")]
         [SerializeField] private int levelIndex;
 
-        private List<Tile> tiles = new List<Tile>();
+        private readonly List<Tile> tiles = new List<Tile>();
+        private readonly List<FruitController> spawnedFruits = new List<FruitController>();
         private MapData mapData;
 
         public int TileCount => tiles.Count;
@@ -87,6 +89,12 @@ namespace DiceGame.Board
                 return;
             }
 
+            if (SimplePoolManager.Instance == null)
+            {
+                Debug.LogError("SimplePoolManager instance not found");
+                return;
+            }
+
             Tile spawnedTile = SimplePoolManager.Instance.Spawn<Tile>(PoolKey.Tile);
             if (spawnedTile != null)
             {
@@ -97,6 +105,8 @@ namespace DiceGame.Board
                 spawnedTile.transform.rotation = Quaternion.identity;
                 spawnedTile.transform.SetParent(boardParent, false);
                 tiles.Add(spawnedTile);
+
+                TrySpawnRewardFruit(tileData, spawnedTile);
             }
             else
             {
@@ -106,11 +116,13 @@ namespace DiceGame.Board
 
         private void ClearExistingTiles()
         {
+            ClearSpawnedFruits();
+
             foreach (var tile in tiles)
             {
                 if (tile != null)
                 {
-                    if(SimplePoolManager.Instance == null)
+                    if (SimplePoolManager.Instance == null)
                     {
                         Debug.LogError("SimplePoolManager instance not found");
                         Destroy(tile.gameObject);
@@ -121,6 +133,59 @@ namespace DiceGame.Board
                 }
             }
             tiles.Clear();
+        }
+
+        private void TrySpawnRewardFruit(TileData tileData, Tile spawnedTile)
+        {
+            if (!tileData.HasReward || DatabaseManager.Instance.FruitDatabase == null)
+            {
+                return;
+            }
+
+            PoolKey fruitPoolKey = DatabaseManager.Instance.FruitDatabase.GetPoolKeyForFruit(tileData.FruitTypeEnum);
+            if (fruitPoolKey == PoolKey.None)
+            {
+                Debug.LogWarning($"No pool key found for reward fruit type '{tileData.fruitType}' on tile {tileData.index}.");
+                return;
+            }
+
+            FruitController spawnedFruit = SimplePoolManager.Instance.Spawn<FruitController>(fruitPoolKey);
+            if (spawnedFruit == null)
+            {
+                return;
+            }
+
+            spawnedFruit.transform.SetParent(spawnedTile.transform, false);
+            spawnedFruit.transform.localPosition = new Vector3(0f, 0.5f, 1f);
+            spawnedFruit.transform.localRotation = Quaternion.identity;
+            spawnedFruits.Add(spawnedFruit);
+        }
+
+        private void ClearSpawnedFruits()
+        {
+            if (DatabaseManager.Instance == null || DatabaseManager.Instance.FruitDatabase == null || SimplePoolManager.Instance == null)
+            {
+                return;
+            }
+
+            foreach (var fruit in spawnedFruits)
+            {
+                if (fruit == null)
+                {
+                    continue;
+                }
+
+                PoolKey fruitPoolKey = DatabaseManager.Instance.FruitDatabase.GetPoolKeyForFruit(fruit.FruitType);
+                if (fruitPoolKey == PoolKey.None)
+                {
+                    Debug.LogWarning($"No pool key found while despawning reward fruit '{fruit.name}'.");
+                    continue;
+                }
+
+                SimplePoolManager.Instance.Despawn(fruitPoolKey, fruit);
+            }
+
+            spawnedFruits.Clear();
         }
 
         public Tile GetTile(int index)

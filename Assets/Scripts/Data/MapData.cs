@@ -22,7 +22,7 @@ namespace DiceGame.Data
         public FruitType FruitTypeEnum { get { return GetFruitType(fruitType); } }
 
         public bool IsEmpty => TileTypeEnum == TileType.Empty;
-        public bool HasReward => TileTypeEnum != TileType.Empty && amount > 0;
+        public bool HasReward => TileTypeEnum == TileType.Fruit && FruitTypeEnum != FruitType.None && amount > 0;
 
         private TileType GetTileType(string type)
         {

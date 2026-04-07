@@ -309,6 +309,63 @@ MonoBehaviour:
   m_Spacing: {x: 75, y: 50}
   m_Constraint: 0
   m_ConstraintCount: 2
+--- !u!1001 &255867265
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2411475127581439505, guid: 2a1b4c301d87f674cb433832f5811340, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2411475127581439505, guid: 2a1b4c301d87f674cb433832f5811340, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2411475127581439505, guid: 2a1b4c301d87f674cb433832f5811340, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2411475127581439505, guid: 2a1b4c301d87f674cb433832f5811340, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2411475127581439505, guid: 2a1b4c301d87f674cb433832f5811340, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2411475127581439505, guid: 2a1b4c301d87f674cb433832f5811340, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2411475127581439505, guid: 2a1b4c301d87f674cb433832f5811340, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2411475127581439505, guid: 2a1b4c301d87f674cb433832f5811340, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2411475127581439505, guid: 2a1b4c301d87f674cb433832f5811340, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2411475127581439505, guid: 2a1b4c301d87f674cb433832f5811340, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6807987999545280295, guid: 2a1b4c301d87f674cb433832f5811340, type: 3}
+      propertyPath: m_Name
+      value: Fruit Base
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 2a1b4c301d87f674cb433832f5811340, type: 3}
 --- !u!1 &286865768
 GameObject:
   m_ObjectHideFlags: 0
@@ -3772,3 +3829,4 @@ SceneRoots:
   - {fileID: 4645715192712074540}
   - {fileID: 413767076}
   - {fileID: 1992716729}
+  - {fileID: 255867265}

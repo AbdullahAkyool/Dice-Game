@@ -133,6 +133,7 @@ namespace DiceGame.Managers
                 maxSize: maxSize);
 
             pools[key] = pool;
+            PrewarmPool(pool, initialSize);
         }
 
         private IPoolable CreatePooledObject(PoolObjectData poolData, Transform parent)
@@ -159,6 +160,25 @@ namespace DiceGame.Managers
         private static void OnReleaseToPool(IPoolable poolable)
         {
             poolable?.OnDespawn();
+        }
+
+        private static void PrewarmPool(ObjectPool<IPoolable> pool, int initialSize)
+        {
+            var createdObjects = new List<IPoolable>(initialSize);
+
+            for (int i = 0; i < initialSize; i++)
+            {
+                IPoolable poolable = pool.Get();
+                if (poolable != null)
+                {
+                    createdObjects.Add(poolable);
+                }
+            }
+
+            for (int i = 0; i < createdObjects.Count; i++)
+            {
+                pool.Release(createdObjects[i]);
+            }
         }
 
         private void OnDestroyPooledObject(IPoolable poolable)

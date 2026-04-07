@@ -23,3 +23,18 @@ MonoBehaviour:
     Prefab: {fileID: 8756849993893334452, guid: 48e939d84b6f70142a8685218f0e6acd, type: 3}
     InitialSize: 10
     MaxSize: 20
+  - Type: 100
+    IsUIObject: 0
+    Prefab: {fileID: 7597830542739966473, guid: 47679a827bc2e5b439c54c57acf9ac3e, type: 3}
+    InitialSize: 10
+    MaxSize: 20
+  - Type: 101
+    IsUIObject: 0
+    Prefab: {fileID: 5610403276718855502, guid: 437deeee82932b741910d12f21e4fbe4, type: 3}
+    InitialSize: 10
+    MaxSize: 20
+  - Type: 102
+    IsUIObject: 0
+    Prefab: {fileID: 4816205482287379167, guid: ae9f3984a768e874e8c169f25d09ea31, type: 3}
+    InitialSize: 10
+    MaxSize: 20
