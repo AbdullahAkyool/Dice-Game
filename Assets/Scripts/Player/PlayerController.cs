@@ -2,6 +2,7 @@ using System.Collections;
 using DiceGame.Board;
 using DiceGame.Managers;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace DiceGame.Player
 {
@@ -10,7 +11,8 @@ namespace DiceGame.Player
         private PlayerAnimatorController animatorController;
 
         [Header("Movement Settings")]
-        [SerializeField] private float moveLerpSpeed = 4f;
+        [FormerlySerializedAs("moveLerpSpeed")]
+        [SerializeField] private float moveSpeed = 4f;
         [SerializeField] private float stopDistance = 0.01f;
 
         private BoardGenerator boardGenerator;
@@ -75,10 +77,9 @@ namespace DiceGame.Player
 
             while (Mathf.Abs(targetPosition.z - transform.position.z) > stopDistance)
             {
-                float nextZ = Mathf.Lerp(transform.position.z, targetPosition.z, moveLerpSpeed * Time.deltaTime);
-                float deltaZ = nextZ - transform.position.z;
-
-                transform.Translate(Vector3.forward * deltaZ, Space.World);
+                Vector3 pos = transform.position;
+                pos.z = Mathf.MoveTowards(pos.z, targetPosition.z, moveSpeed * Time.deltaTime);
+                transform.position = pos;
 
                 yield return null;
             }

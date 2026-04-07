@@ -13,7 +13,7 @@ namespace DiceGame.Dice
         public int TargetFaceValue { get => targetFaceValue; set => targetFaceValue = value; }
 
         [Header("Spawn")]
-        [SerializeField] private Vector3 landingWorldPosition;
+        private Vector3 landingWorldPosition;
         [SerializeField, Range(5f, 60f)] private float cornerTiltAngle = 28f;
 
         [Header("Drop")]
@@ -36,6 +36,8 @@ namespace DiceGame.Dice
             rb = GetComponent<Rigidbody>();
             rb.isKinematic = true;
             initialRotation = transform.rotation;
+
+            landingWorldPosition = transform.position;
         }
 
         private void OnEnable()
