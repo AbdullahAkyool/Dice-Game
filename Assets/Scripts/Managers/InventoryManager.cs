@@ -49,6 +49,27 @@ namespace DiceGame.Managers
         {
             InitializeFruitSlots();
         }
+
+        public void ApplyFromSave(Dictionary<FruitType, int> values) // save dosyasindan gelen degerleri uygula
+        {
+            if (values == null)
+            {
+                return;
+            }
+
+            InitializeFruitSlots();
+            foreach (var kv in values)
+            {
+                if (kv.Key == FruitType.None)
+                {
+                    continue;
+                }
+
+                Fruits[kv.Key] = kv.Value;
+            }
+
+            EventManager.InventoryEvents.OnInventoryForceRefresh?.Invoke();
+        }
         private void HandleItemAdded(FruitType fruitType, int amount)
         {
             if (amount <= 0) return;

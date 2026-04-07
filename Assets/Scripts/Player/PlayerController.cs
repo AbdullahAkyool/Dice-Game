@@ -108,6 +108,11 @@ namespace DiceGame.Player
 
         private void ResetToStartTile()
         {
+            TeleportToTile(0);
+        }
+
+        public void TeleportToTile(int tileIndex) // save dosyasindan gelen tile indexine playeri aninda teleport et, genellikle level resetlenirken veya save dosyasindan gelen degerler uygulandiktan sonra kullanilir
+        {
             StopCurrentMovement();
 
             if (boardGenerator == null)
@@ -115,14 +120,14 @@ namespace DiceGame.Player
                 boardGenerator = BoardGenerator.Instance;
             }
 
-            Tile startTile = boardGenerator != null ? boardGenerator.GetTile(0) : null;
-            if (startTile == null)
+            Tile tile = boardGenerator != null ? boardGenerator.GetTile(tileIndex) : null;
+            if (tile == null)
             {
-                Debug.LogWarning("ResetToStartTile: tile 0 not found.");
+                Debug.LogWarning($"TeleportToTile: tile {tileIndex} not found.");
                 return;
             }
 
-            Vector3 targetPosition = startTile.GetPlayerPosition();
+            Vector3 targetPosition = tile.GetPlayerPosition();
             targetPosition.x = transform.position.x;
             targetPosition.y = transform.position.y;
             transform.position = targetPosition;

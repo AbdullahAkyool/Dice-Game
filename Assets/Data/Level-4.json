@@ -1,0 +1,58 @@
+{
+    "tiles": [
+        {
+            "index": 0,
+            "type": "empty"
+        },
+        {
+            "index": 1,
+            "type": "fruit",
+            "fruitType": "pear",
+            "amount": 45
+        },
+        {
+            "index": 2,
+            "type": "fruit",
+            "fruitType": "apple",
+            "amount": 50
+        },
+        {
+            "index": 3,
+            "type": "fruit",
+            "fruitType": "strawberry",
+            "amount": 35
+        },
+        {
+            "index": 4,
+            "type": "empty"
+        },
+        {
+            "index": 5,
+            "type": "fruit",
+            "fruitType": "apple",
+            "amount": 40
+        },
+        {
+            "index": 6,
+            "type": "fruit",
+            "fruitType": "pear",
+            "amount": 25
+        },
+        {
+            "index": 7,
+            "type": "fruit",
+            "fruitType": "strawberry",
+            "amount": 55
+        },
+        {
+            "index": 8,
+            "type": "fruit",
+            "fruitType": "apple",
+            "amount": 30
+        },
+        {
+            "index": 9,
+            "type": "empty"
+        }
+    ]
+}

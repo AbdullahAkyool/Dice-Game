@@ -16,20 +16,27 @@ namespace DiceGame.UI
         [SerializeField] private Image itemIcon;
         [SerializeField] private TMP_Text itemCountText;
 
+        void OnEnable()
+        {
+            EventManager.InventoryEvents.OnUpdateItemUIElement += IncreaseItemCount;
+            EventManager.InventoryEvents.OnInventoryForceRefresh += HandleInventoryForceRefresh;
+        }
+
+        void OnDisable()
+        {
+            EventManager.InventoryEvents.OnUpdateItemUIElement -= IncreaseItemCount;
+            EventManager.InventoryEvents.OnInventoryForceRefresh -= HandleInventoryForceRefresh;
+        }
+
         private void Start()
         {
             UpdateItemCount();
             SetItemUIElement(fruitType);
         }
 
-        void OnEnable()
+        private void HandleInventoryForceRefresh() // save dosyasindan gelen degerler uygulandiktan sonra UIin guncellenmesi icin
         {
-            EventManager.InventoryEvents.OnUpdateItemUIElement += IncreaseItemCount;
-        }
-
-        void OnDisable()
-        {
-            EventManager.InventoryEvents.OnUpdateItemUIElement -= IncreaseItemCount;
+            UpdateItemCount();
         }
 
         private void SetItemUIElement(FruitType fruitType)

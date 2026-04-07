@@ -15,3 +15,11 @@ MonoBehaviour:
   levels:
   - levelIndex: 0
     mapJsonFile: {fileID: 4900000, guid: 8735e57ef80c8394d918fb1b43b4779f, type: 3}
+  - levelIndex: 1
+    mapJsonFile: {fileID: 4900000, guid: 943801d455aad0649abda8ead50b94f5, type: 3}
+  - levelIndex: 2
+    mapJsonFile: {fileID: 4900000, guid: 8c5e652b4654b434c9bb8fe4c7c1bed7, type: 3}
+  - levelIndex: 3
+    mapJsonFile: {fileID: 4900000, guid: e68e167419b982f409d8ec12cbf14808, type: 3}
+  - levelIndex: 4
+    mapJsonFile: {fileID: 4900000, guid: 01a277676d582b74cbd1e0b7094d5ba8, type: 3}

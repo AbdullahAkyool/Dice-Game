@@ -18,6 +18,16 @@ namespace DiceGame.Dice
         [SerializeField] private List<DiceController> diceControllers;
         private int diceCompetedCount = 0;
 
+        public int CurrentTileIndex => currentTileIndex;
+
+        public void ApplyTileIndexFromSave(int tileIndex) // save dosyasindan gelen tile indexini uygula
+        {
+            currentTileIndex = tileIndex;
+            pendingTargetTileIndex = tileIndex;
+            diceCompetedCount = 0;
+            tempDiceValues = null;
+        }
+
         private void OnEnable()
         {
             EventManager.InventoryEvents.OnCheckEarnableRewards += CheckEarnableRewards;
@@ -168,6 +178,8 @@ namespace DiceGame.Dice
             LogRollResult(tempDiceValues, total, currentTileIndex);
             CheckEarnableRewards();
             tempDiceValues = null;
+
+            EventManager.GameFlowEvents.OnLevelProgressChanged?.Invoke(); // player hareketi tamamlandiginda level progress degismis olur, kaydetmek icin eventi invoke et
         }
 
         private void LogRollResult(int[] diceValues, int total, int targetTileIndex)

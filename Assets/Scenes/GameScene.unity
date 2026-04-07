@@ -1421,6 +1421,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eec0f58c77811e5479ce643684b7fef9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  diceRollController: {fileID: 294495726}
+  playerController: {fileID: 1837143324}
 --- !u!4 &873663822
 Transform:
   m_ObjectHideFlags: 0
