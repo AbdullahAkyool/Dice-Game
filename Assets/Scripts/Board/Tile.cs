@@ -6,12 +6,11 @@ using UnityEngine;
 
 namespace DiceGame.Board
 {
-    public class Tile : MonoBehaviour , IPoolable
+    public class Tile : MonoBehaviour, IPoolable
     {
         [Header("References")]
         [SerializeField] private TMP_Text tileNumberText;
         [SerializeField] private TMP_Text rewardText;
-        [SerializeField] private MeshRenderer meshRenderer;
 
         public int TileIndex { get; private set; }
         public TileData TileData { get; private set; }
@@ -31,21 +30,10 @@ namespace DiceGame.Board
                 tileNumberText.text = TileIndex.ToString();
             }
 
-            if (meshRenderer != null)
-            {
-                meshRenderer.material.color = TileData.TileColor;
-            }
-
             if (TileData.HasReward)
             {
-                var fruitData = DatabaseManager.Instance.FruitDatabase.GetFruit(TileData.FruitTypeEnum);
-                if (fruitData != null && meshRenderer != null)
-                {
-                    meshRenderer.material.color = fruitData.tileColor;
-
-                    string fruitName = GetFruitName(TileData.FruitTypeEnum);
-                    rewardText.text = $"{fruitName} x{TileData.amount}";
-                }
+                string fruitName = GetFruitName(TileData.FruitTypeEnum);
+                rewardText.text = $"{fruitName} x{TileData.amount}";
             }
             else
             {
@@ -58,11 +46,6 @@ namespace DiceGame.Board
 
         private void Reset()
         {
-            if (meshRenderer != null)
-            {
-                meshRenderer.material.color = Color.white;
-            }
-
             if (rewardText != null)
             {
                 rewardText.text = "";

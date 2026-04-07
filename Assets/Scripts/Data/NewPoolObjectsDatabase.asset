@@ -15,7 +15,7 @@ MonoBehaviour:
   poolObjects:
   - Type: 1
     IsUIObject: 0
-    Prefab: {fileID: 4240095698916797160, guid: a35ba7a7b3133d944a59de4673deb68e, type: 3}
+    Prefab: {fileID: 151904627172563984, guid: 05ab3c9f84fc32e479aa435885a83094, type: 3}
     InitialSize: 20
     MaxSize: 50
   - Type: 2

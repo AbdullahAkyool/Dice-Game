@@ -18,18 +18,11 @@ namespace DiceGame.Data
         public string type;
         public string fruitType;
         public int amount;
-        public Color TileColor { get { return GetTileColor(GetFruitType(fruitType)); } }
         public TileType TileTypeEnum { get { return GetTileType(type); } }
         public FruitType FruitTypeEnum { get { return GetFruitType(fruitType); } }
 
         public bool IsEmpty => TileTypeEnum == TileType.Empty;
         public bool HasReward => TileTypeEnum != TileType.Empty && amount > 0;
-
-        private Color GetTileColor(FruitType fruitType)
-        {
-            if(fruitType == FruitType.None) return Color.white;
-            return DatabaseManager.Instance.FruitDatabase.GetFruit(fruitType).tileColor;
-        }
 
         private TileType GetTileType(string type)
         {

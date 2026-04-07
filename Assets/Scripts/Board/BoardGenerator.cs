@@ -11,6 +11,7 @@ namespace DiceGame.Board
 
         [Header("References")]
         [SerializeField] private Transform boardParent;
+        [SerializeField] private float spawnOffset = 5f;
 
         [Header("Board Settings")]
         [SerializeField] private int levelIndex;
@@ -89,7 +90,7 @@ namespace DiceGame.Board
             Tile spawnedTile = SimplePoolManager.Instance.Spawn<Tile>(PoolKey.Tile);
             if (spawnedTile != null)
             {
-                Vector3 position = new Vector3(0, 0, index * spawnedTile.transform.localScale.z);
+                Vector3 position = new Vector3(0, 0, index * spawnOffset);
                 spawnedTile.name = $"Tile_{index}";
                 spawnedTile.Initialize(tileData);
                 spawnedTile.transform.position = position;
@@ -115,7 +116,7 @@ namespace DiceGame.Board
                         Destroy(tile.gameObject);
                         return;
                     }
-                    
+
                     SimplePoolManager.Instance.Despawn(PoolKey.Tile, tile);
                 }
             }

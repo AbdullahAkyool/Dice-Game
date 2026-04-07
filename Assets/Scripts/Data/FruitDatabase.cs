@@ -20,7 +20,6 @@ namespace DiceGame.Data
     {
         public FruitType fruitType;
         public Sprite fruitIcon;
-        public Color tileColor;
     }
 
     public enum FruitType
