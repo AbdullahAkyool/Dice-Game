@@ -75,7 +75,7 @@ namespace DiceGame.UI
             StartCoroutine(PlayEffectRoutine());
         }
 
-        private void HandleRewardTileReached(FruitType fruitType, int amount)
+        private void HandleRewardTileReached(FruitType fruitType, int amount) //fruit, target ve amount gecerliyse efekti basalt
         {
             if (amount <= 0 || fruitType == FruitType.None)
             {
@@ -101,7 +101,7 @@ namespace DiceGame.UI
             Play();
         }
 
-        private void CacheParticlePieces()
+        private void CacheParticlePieces() //particle parcalarini cachele, pozisyon, rotasyon ve scale bilgilerini sakla
         {
             int childCount = particlePiecesParent.transform.childCount;
             particlePieces = new RectTransform[childCount];
@@ -145,7 +145,7 @@ namespace DiceGame.UI
             }
         }
 
-        private IEnumerator PlayEffectRoutine()
+        private IEnumerator PlayEffectRoutine() // her particle parcasini delay ile hareket ettir, toplam efekt suresine gore bekle ve sonra odul ekle ve efekti resetle
         {
             for (int i = 0; i < particlePieces.Length; i++)
             {
@@ -158,7 +158,7 @@ namespace DiceGame.UI
             ResetEffect();
         }
 
-        private float GetTotalEffectDuration()
+        private float GetTotalEffectDuration() // son particle parcasinin hareketi ve scale animasyonunun bitis zamanina gore toplam efekt suresini hesapla
         {
             if (particlePieces == null || particlePieces.Length == 0)
             {
@@ -201,18 +201,18 @@ namespace DiceGame.UI
 
         private IEnumerator AnimateParticleRoutine(RectTransform particlePiece, int index, float delay)
         {
-            yield return new WaitForSeconds(delay);
+            yield return new WaitForSeconds(delay); // her particle parcasina delay ver, bu sayede hareketler birbirini takip eder gibi gorunur
 
-            yield return StartCoroutine(LerpScale(particlePiece, Vector3.zero, initialScales[index], ScaleUpDuration));
+            yield return StartCoroutine(LerpScale(particlePiece, Vector3.zero, initialScales[index], ScaleUpDuration)); // particle parcasinin scale animasyonu
 
-            yield return new WaitForSeconds(PreMoveDelay);
+            yield return new WaitForSeconds(PreMoveDelay); // hareket oncesi bekleme, bu sure zarfinda oyuncu hareketi algilayabilir ve efektin hareketini daha iyi takip edebilir
 
             float elapsed = 0f;
             Vector2 startPos = particlePiece.anchoredPosition;
             Quaternion startRot = particlePiece.localRotation;
             Vector2 targetPosition = GetParticleTargetPosition(particlePiece);
 
-            while (elapsed < MoveDuration)
+            while (elapsed < MoveDuration) // hareket animasyonu, bu sure zarfinda particle parcasini hedef pozisyona dogru hareket ettir ve rotasyonunu sifirla
             {
                 elapsed += Time.deltaTime;
                 float t = Mathf.Clamp01(elapsed / MoveDuration);
@@ -225,7 +225,7 @@ namespace DiceGame.UI
 
             particlePiece.anchoredPosition = targetPosition;
             particlePiece.localRotation = Quaternion.identity;
-            yield return StartCoroutine(LerpScale(particlePiece, initialScales[index], Vector3.zero, ScaleDownDuration));
+            yield return StartCoroutine(LerpScale(particlePiece, initialScales[index], Vector3.zero, ScaleDownDuration)); // hareket bittikten sonra scale animasyonu ile particle parcasini kucult ve kaybolmasini sagla
         }
 
         private Vector2 GetParticleTargetPosition(RectTransform particlePiece)
