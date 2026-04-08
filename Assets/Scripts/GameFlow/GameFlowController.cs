@@ -34,6 +34,7 @@ namespace DiceGame.GameFlow
             }
 
             Instance = this;
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
             ResolveGameplayReferences();
             BuildStateMachine();
