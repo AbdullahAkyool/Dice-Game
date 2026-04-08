@@ -16,6 +16,9 @@ namespace DiceGame.Managers
         [SerializeField] private Button resetButton;
         [SerializeField] private Button menuButton;
 
+        [Header("Dice Elements Holder")]
+        [SerializeField] private GameObject[] diceElementsHolder;
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -87,6 +90,22 @@ namespace DiceGame.Managers
         public void OpenLevelMenu()
         {
             EventManager.GameFlowEvents.OnOpenLevelSelectionRequested?.Invoke();
+        }
+
+        public void SetDiceElementsActive(bool active)
+        {
+            if (diceElementsHolder == null)
+            {
+                return;
+            }
+
+            foreach (GameObject holder in diceElementsHolder)
+            {
+                if (holder != null)
+                {
+                    holder.SetActive(active);
+                }
+            }
         }
 
         private static void SetPanel(CanvasGroup group, bool visible)

@@ -28,8 +28,15 @@ namespace DiceGame.GameFlow.States
             int target = _ctx.DiceRollController.ComputeTargetTileIndex(total);
             _ctx.DiceRollController.SetPendingTargetTileIndex(target);
 
+            int fromTile = _ctx.DiceRollController.CurrentTileIndex;
+
             EventManager.PlayerEvents.OnPlayerMovementCompleted += OnMovementCompleted;
-            EventManager.PlayerEvents.OnPlayerMoveRequested?.Invoke(target);
+            EventManager.PlayerEvents.OnPlayerMoveRequested?.Invoke(fromTile, target);
+
+            if(UIManager.Instance != null)
+            {
+                UIManager.Instance.SetDiceElementsActive(false);
+            }
         }
 
         public void OnUpdate(GameFlowStateMachine machine)
@@ -40,6 +47,11 @@ namespace DiceGame.GameFlow.States
         {
             EventManager.PlayerEvents.OnPlayerMovementCompleted -= OnMovementCompleted;
             _machine = null;
+
+            if (UIManager.Instance != null)
+            {
+                UIManager.Instance.SetDiceElementsActive(true);
+            }
         }
 
         private void OnMovementCompleted()
