@@ -35,10 +35,6 @@ namespace DiceGame.Data
     {
         None = 0,
         Tile = 1,
-        LevelUIItem = 2,
-        Fruit_Apple = 100,
-        Fruit_Pear = 101,
-        Fruit_Strawberry = 102,
-
+        LevelUIItem = 2
     }
 }

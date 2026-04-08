@@ -3,6 +3,7 @@ using DiceGame.Managers;
 using DiceGame.Pooling;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace DiceGame.Board
 {
@@ -10,7 +11,8 @@ namespace DiceGame.Board
     {
         [Header("References")]
         [SerializeField] private TMP_Text tileNumberText;
-        [SerializeField] private TMP_Text rewardText;
+        [SerializeField] private TMP_Text rewardCountText;
+        [SerializeField] private Image rewardImage;
 
         public int TileIndex { get; private set; }
         public TileData TileData { get; private set; }
@@ -32,35 +34,36 @@ namespace DiceGame.Board
 
             if (TileData.HasReward)
             {
-                string fruitName = GetFruitName(TileData.FruitTypeEnum);
-                rewardText.text = $"{fruitName} x{TileData.amount}";
+                Sprite fruitIcon = GetFruitIcon(TileData.FruitTypeEnum);
+                rewardImage.sprite = fruitIcon;
+                rewardCountText.text = $"x{TileData.amount}";
             }
             else
             {
-                if (rewardText != null)
+                if (rewardCountText != null)
                 {
-                    rewardText.text = "";
+                    rewardCountText.text = "";
                 }
             }
         }
 
         private void Reset()
         {
-            if (rewardText != null)
+            if (rewardCountText != null)
             {
-                rewardText.text = "";
+                rewardCountText.text = "";
             }
         }
 
-        private string GetFruitName(FruitType fruitType)
+        private Sprite GetFruitIcon(FruitType fruitType)
         {
-            return fruitType switch
+            if (DatabaseManager.Instance == null || DatabaseManager.Instance.FruitDatabase == null)
             {
-                FruitType.Apple => "Apple",
-                FruitType.Pear => "Pear",
-                FruitType.Strawberry => "Strawberry",
-                _ => "Fruit"
-            };
+                Debug.LogError("DatabaseManager or FruitDatabase not assigned.");
+                return null;
+            }
+
+            return DatabaseManager.Instance.FruitDatabase.GetFruitIcon(fruitType);
         }
 
         public Vector3 GetPlayerPosition()

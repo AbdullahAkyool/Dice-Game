@@ -14,15 +14,10 @@ namespace DiceGame.Data
             return fruits.Find(fruit => fruit.fruitType == fruitType);
         }
 
-        public PoolKey GetPoolKeyForFruit(FruitType fruitType)
+        public Sprite GetFruitIcon(FruitType fruitType)
         {
-            return fruitType switch
-            {
-                FruitType.Apple => PoolKey.Fruit_Apple,
-                FruitType.Pear => PoolKey.Fruit_Pear,
-                FruitType.Strawberry => PoolKey.Fruit_Strawberry,
-                _ => PoolKey.None
-            };
+            var fruitData = GetFruit(fruitType);
+            return fruitData != null ? fruitData.fruitIcon : null;
         }
     }
 
