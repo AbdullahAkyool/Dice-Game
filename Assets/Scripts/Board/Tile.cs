@@ -12,7 +12,7 @@ namespace DiceGame.Board
         [Header("References")]
         [SerializeField] private TMP_Text tileNumberText;
         [SerializeField] private TMP_Text rewardCountText;
-        [SerializeField] private Image rewardImage;
+        [SerializeField] private SpriteRenderer rewardIcon;
 
         public int TileIndex { get; private set; }
         public TileData TileData { get; private set; }
@@ -34,8 +34,13 @@ namespace DiceGame.Board
 
             if (TileData.HasReward)
             {
+                if (rewardIcon != null)
+                {
+                    rewardIcon.enabled = true;
+                }
+
                 Sprite fruitIcon = GetFruitIcon(TileData.FruitTypeEnum);
-                rewardImage.sprite = fruitIcon;
+                rewardIcon.sprite = fruitIcon;
                 rewardCountText.text = $"x{TileData.amount}";
             }
             else
@@ -43,6 +48,11 @@ namespace DiceGame.Board
                 if (rewardCountText != null)
                 {
                     rewardCountText.text = "";
+                }
+
+                if (rewardIcon != null)
+                {
+                    rewardIcon.enabled = false;
                 }
             }
         }
