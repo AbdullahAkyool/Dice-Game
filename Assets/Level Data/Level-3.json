@@ -2,9 +2,7 @@
     "tiles": [
         {
             "index": 0,
-            "type": "fruit",
-            "fruitType": "strawberry",
-            "amount": 25
+            "type": "start"
         },
         {
             "index": 1,

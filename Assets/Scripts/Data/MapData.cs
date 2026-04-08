@@ -28,6 +28,7 @@ namespace DiceGame.Data
         {
             return type?.ToLower() switch
             {
+                "start" => TileType.Start,
                 "empty" => TileType.Empty,
                 "fruit" => TileType.Fruit,
                 _ => TileType.None
@@ -49,7 +50,8 @@ namespace DiceGame.Data
     public enum TileType
     {
         None = 0,
-        Empty = 1,
-        Fruit = 2
+        Start = 1,
+        Empty = 2,
+        Fruit = 3
     }
 }

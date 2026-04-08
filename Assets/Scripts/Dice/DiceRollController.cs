@@ -129,7 +129,8 @@ namespace DiceGame.Dice
             string tileInfo = DescribeLandingTile(targetTile, currentTileIndex);
 
             if (targetTile != null
-                && !BoardGenerator.IsStartTileIndex(currentTileIndex)
+                && targetTile.TileData != null
+                && targetTile.TileData.TileTypeEnum != TileType.Start
                 && targetTile.TileData.HasReward)
             {
                 tileInfo += $" (Reward: {targetTile.TileData.FruitTypeEnum} x{targetTile.TileData.amount})";
@@ -150,7 +151,7 @@ namespace DiceGame.Dice
                 return "Unknown Tile";
             }
 
-            if (BoardGenerator.IsStartTileIndex(boardIndex))
+            if (tile.TileData != null && tile.TileData.TileTypeEnum == TileType.Start)
             {
                 return "START";
             }
@@ -165,13 +166,13 @@ namespace DiceGame.Dice
                 boardGenerator = BoardGenerator.Instance;
             }
 
-            if (BoardGenerator.IsStartTileIndex(currentTileIndex))
+            Tile targetTile = boardGenerator.GetTile(currentTileIndex);
+            if (targetTile == null)
             {
                 return;
             }
 
-            Tile targetTile = boardGenerator.GetTile(currentTileIndex);
-            if (targetTile == null)
+            if (targetTile.TileData != null && targetTile.TileData.TileTypeEnum == TileType.Start)
             {
                 return;
             }

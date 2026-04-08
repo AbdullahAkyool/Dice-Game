@@ -22,7 +22,7 @@ namespace DiceGame.Board
         {
             TileData = tileData;
             TileIndex = boardIndex;
-            IsStartTile = BoardGenerator.IsStartTileIndex(boardIndex);
+            IsStartTile = tileData != null && tileData.TileTypeEnum == TileType.Start;
 
             UpdateVisuals();
         }

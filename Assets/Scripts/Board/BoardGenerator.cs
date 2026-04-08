@@ -25,7 +25,18 @@ namespace DiceGame.Board
         public const int StartTileBoardIndex = 0;
         public const int FirstPlayableTileBoardIndex = 1;
 
-        public static bool IsStartTileIndex(int boardIndex) => boardIndex == StartTileBoardIndex;
+        public static bool IsStartTileIndex(int boardIndex)
+        {
+            if (Instance == null)
+            {
+                return boardIndex == StartTileBoardIndex;
+            }
+
+            Tile tile = Instance.GetTile(boardIndex);
+            return tile != null
+                ? tile.TileData != null && tile.TileData.TileTypeEnum == TileType.Start
+                : boardIndex == StartTileBoardIndex;
+        }
 
         private void Awake()
         {
