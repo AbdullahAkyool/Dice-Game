@@ -35,6 +35,7 @@ namespace DiceGame.Dice
         {
             rb = GetComponent<Rigidbody>();
             rb.isKinematic = true;
+            rb.useGravity = false;
             initialRotation = transform.rotation;
 
             landingWorldPosition = transform.position;
@@ -86,6 +87,7 @@ namespace DiceGame.Dice
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
             rb.isKinematic = true;
+            rb.useGravity = false;
             rb.MovePosition(landingWorldPosition);
             rb.MoveRotation(initialRotation);
             transform.SetPositionAndRotation(landingWorldPosition, initialRotation);
@@ -93,7 +95,6 @@ namespace DiceGame.Dice
 
         private IEnumerator RollRoutine()
         {
-            rb.isKinematic = false;
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
 
@@ -102,7 +103,7 @@ namespace DiceGame.Dice
             rb.MovePosition(spawn);
             rb.MoveRotation(dropStartRot);
 
-            yield return new WaitForFixedUpdate(); // bir fixedupdate bekle ki fizik engine spawn pozunu islesin
+            yield return new WaitForFixedUpdate(); // fizik adimi ile senkron (interpolation / ic guncellemeler)
 
             Quaternion dropEndRot = MultiplyRandomSpin(dropStartRot); // Duserken random spin atsin diye
 
@@ -117,7 +118,6 @@ namespace DiceGame.Dice
 
             yield return new WaitForFixedUpdate();
 
-            rb.isKinematic = true;
             rollRoutine = null;
 
             EventManager.DiceEvents.OnDiceRollingFinished?.Invoke();

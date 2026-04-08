@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace DiceGame.GameFlow.States
 {
-    public sealed class RollingDiceSettledState : IGameState
+    public sealed class RollingDiceSettledState : IGameState //UniTask'a gecilecek
     {
         private readonly GameSessionContext _ctx;
         private GameFlowStateMachine _machine;
