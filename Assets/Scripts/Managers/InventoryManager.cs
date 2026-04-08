@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using DiceGame.Data;
+using DiceGame.UI;
 using UnityEngine;
 
 namespace DiceGame.Managers
@@ -9,6 +10,7 @@ namespace DiceGame.Managers
     {
         public static InventoryManager Instance { get; private set; }
         public Dictionary<FruitType, int> Fruits { get; private set; } = new Dictionary<FruitType, int>();
+        [SerializeField] private List<InventoryItemUIElement> inventoryUIElements;
 
         private void Awake()
         {
@@ -87,6 +89,31 @@ namespace DiceGame.Managers
             EventManager.InventoryEvents.OnUpdateItemUIElement?.Invoke(fruitType, amount);
 
             Debug.Log($"Earned {amount} {fruitType}. Total: {Fruits[fruitType]}");
+        }
+
+        public InventoryItemUIElement GetInventoryItemUIElement(FruitType fruitType)
+        {
+            if (inventoryUIElements == null || inventoryUIElements.Count == 0)
+            {
+                return null;
+            }
+
+            for (int i = 0; i < inventoryUIElements.Count; i++)
+            {
+                InventoryItemUIElement itemUIElement = inventoryUIElements[i];
+                if (itemUIElement != null && itemUIElement.FruitType == fruitType)
+                {
+                    return itemUIElement;
+                }
+            }
+
+            return null;
+        }
+
+        public RectTransform GetInventoryItemUIElementTargetPoint(FruitType fruitType)
+        {
+            InventoryItemUIElement itemUIElement = GetInventoryItemUIElement(fruitType);
+            return itemUIElement != null ? itemUIElement.TargetPoint : null;
         }
     }
 }

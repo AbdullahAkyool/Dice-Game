@@ -148,7 +148,14 @@ namespace DiceGame.Dice
                 int fruitCount = targetTile.TileData.amount;
                 FruitType fruitType = targetTile.TileData.FruitTypeEnum;
 
-                EventManager.InventoryEvents.OnItemAdded?.Invoke(fruitType, fruitCount);
+                if (EventManager.InventoryEvents.OnRewardTileReached != null)
+                {
+                    EventManager.InventoryEvents.OnRewardTileReached.Invoke(fruitType, fruitCount);
+                }
+                else
+                {
+                    EventManager.InventoryEvents.OnItemAdded?.Invoke(fruitType, fruitCount);
+                }
             }
         }
 

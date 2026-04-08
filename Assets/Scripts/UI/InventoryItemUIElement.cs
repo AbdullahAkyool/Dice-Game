@@ -10,6 +10,7 @@ namespace DiceGame.UI
     {
         [SerializeField] private FruitType fruitType;
         public FruitType FruitType => fruitType;
+        public RectTransform TargetPoint => transform as RectTransform;
 
         private int itemCount;
 
