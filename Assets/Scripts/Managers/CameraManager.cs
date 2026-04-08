@@ -83,7 +83,7 @@ namespace DiceGame.Managers
 
             yield return new WaitForSeconds(blendIndex >= 0 ? blenderSettings.CustomBlends[blendIndex].Blend.Time + .5f : 1.5f);
 
-            EventManager.DiceEvents.OnDiceRollingStarted?.Invoke();
+            EventManager.CameraEvents.OnDiceCameraTransitionCompleted?.Invoke();
         }
     }
 }

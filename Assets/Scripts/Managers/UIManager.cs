@@ -65,18 +65,17 @@ namespace DiceGame.Managers
             SetPanel(gameplayPanel, false);
         }
 
-        private void HandleStateChanged(GameFlowState state)
+        private void HandleStateChanged(GameStateType state)
         {
-            switch (state)
+            if (state == GameStateType.LevelSelection)
             {
-                case GameFlowState.LevelSelection:
-                    SetPanel(levelSelectPanel, true);
-                    SetPanel(gameplayPanel, false);
-                    break;
-                case GameFlowState.Gameplay:
-                    SetPanel(levelSelectPanel, false);
-                    SetPanel(gameplayPanel, true);
-                    break;
+                SetPanel(levelSelectPanel, true);
+                SetPanel(gameplayPanel, false);
+            }
+            else
+            {
+                SetPanel(levelSelectPanel, false);
+                SetPanel(gameplayPanel, true);
             }
         }
 

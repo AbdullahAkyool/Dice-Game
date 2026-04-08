@@ -1,10 +1,8 @@
-using UnityEngine;
-using DiceGame.Managers;
+using System.Collections.Generic;
 using DiceGame.Board;
 using DiceGame.Data;
-using System.Collections.Generic;
-using Unity.VisualScripting;
-using System.Collections;
+using DiceGame.Managers;
+using UnityEngine;
 
 namespace DiceGame.Dice
 {
@@ -13,52 +11,32 @@ namespace DiceGame.Dice
         [Header("References")]
         private BoardGenerator boardGenerator;
 
-        private int currentTileIndex = 0;
+        private int currentTileIndex;
+        private int pendingTargetTileIndex;
+
+        [SerializeField] private List<DiceController> diceControllers;
+
         public int CurrentTileIndex => currentTileIndex;
 
-        private int pendingTargetTileIndex = 0;
+        public int DiceCount => diceControllers != null ? diceControllers.Count : 0;
 
-        private int[] tempDiceValues;
-        [SerializeField] private List<DiceController> diceControllers;
-        private int diceCompetedCount = 0;
-
-        [SerializeField] private float playerCameraTransitionDelay = 0.5f;
-        private Coroutine playerCameraTransitionRoutine;
-
-        public void ApplyTileIndexFromSave(int tileIndex) // save dosyasindan gelen tile indexini uygula
+        public void ApplyTileIndexFromSave(int tileIndex)
         {
             currentTileIndex = tileIndex;
             pendingTargetTileIndex = tileIndex;
-            diceCompetedCount = 0;
-            tempDiceValues = null;
         }
 
         private void OnEnable()
         {
             EventManager.InventoryEvents.OnCheckEarnableRewards += CheckEarnableRewards;
-
-            EventManager.DiceEvents.OnDiceValuesEntered += HandleDiceValuesEntered;
-            EventManager.DiceEvents.OnDiceRollingStarted += StartDiceRolling;
-            EventManager.DiceEvents.OnDiceRollingFinished += CheckDicesCompeted;
-            EventManager.DiceEvents.OnStopGameplayActivities += StopActiveGameplay;
-            EventManager.PlayerEvents.OnPlayerMovementCompleted += HandlePlayerMovementCompleted;
-            EventManager.CameraEvents.OnPlayerCameraTransitionCompleted += HandlePlayerCameraTransitionCompleted;
-
+            EventManager.DiceEvents.OnStopGameplayActivities += AbortActiveTurnSession;
             EventManager.DiceEvents.OnResetGameplayState += ResetGameplayState;
-
         }
 
         private void OnDisable()
         {
             EventManager.InventoryEvents.OnCheckEarnableRewards -= CheckEarnableRewards;
-
-            EventManager.DiceEvents.OnDiceValuesEntered -= HandleDiceValuesEntered;
-            EventManager.DiceEvents.OnDiceRollingStarted -= StartDiceRolling;
-            EventManager.DiceEvents.OnDiceRollingFinished -= CheckDicesCompeted;
-            EventManager.DiceEvents.OnStopGameplayActivities -= StopActiveGameplay;
-            EventManager.PlayerEvents.OnPlayerMovementCompleted -= HandlePlayerMovementCompleted;
-            EventManager.CameraEvents.OnPlayerCameraTransitionCompleted -= HandlePlayerCameraTransitionCompleted;
-
+            EventManager.DiceEvents.OnStopGameplayActivities -= AbortActiveTurnSession;
             EventManager.DiceEvents.OnResetGameplayState -= ResetGameplayState;
         }
 
@@ -67,10 +45,12 @@ namespace DiceGame.Dice
             boardGenerator = BoardGenerator.Instance;
         }
 
-        private void HandleDiceValuesEntered(int[] diceValues)
+        public void ConfigureDiceTargets(int[] diceValues)
         {
-            tempDiceValues = diceValues;
-            if (diceControllers == null) return;
+            if (diceControllers == null || diceValues == null)
+            {
+                return;
+            }
 
             for (int i = 0; i < diceControllers.Count; i++)
             {
@@ -79,15 +59,14 @@ namespace DiceGame.Dice
                     diceControllers[i].TargetFaceValue = diceValues[i];
                 }
             }
-
-            EventManager.CameraEvents.OnSwitchToDiceCamera?.Invoke();
-
         }
 
-        private void StartDiceRolling()
+        public void StartAllDiceRolling()
         {
-            if (diceControllers == null) return;
-            if (tempDiceValues == null) return;
+            if (diceControllers == null)
+            {
+                return;
+            }
 
             foreach (DiceController diceController in diceControllers)
             {
@@ -95,17 +74,23 @@ namespace DiceGame.Dice
             }
         }
 
-        private int CalculateTotal(int[] diceValues)
+        public int CalculateTotal(int[] diceValues)
         {
+            if (diceValues == null || diceValues.Length == 0)
+            {
+                return 0;
+            }
+
             int total = 0;
             foreach (int value in diceValues)
             {
                 total += value;
             }
+
             return total;
         }
 
-        private int CalculateTargetTileIndex(int steps)
+        public int ComputeTargetTileIndex(int steps)
         {
             if (boardGenerator == null)
             {
@@ -116,38 +101,45 @@ namespace DiceGame.Dice
             return boardGenerator.GetWrappedIndex(newIndex);
         }
 
-        private void CheckDicesCompeted()
+        public void SetPendingTargetTileIndex(int index)
         {
-            if (tempDiceValues == null || tempDiceValues.Length == 0)
-            {
-                return;
-            }
-
-            if (diceControllers == null || diceControllers.Count == 0)
-            {
-                return;
-            }
-
-            diceCompetedCount++;
-
-            if (diceCompetedCount >= diceControllers.Count)
-            {
-                diceCompetedCount = 0;
-
-                if (playerCameraTransitionRoutine != null)
-                {
-                    StopCoroutine(playerCameraTransitionRoutine);
-                }
-                playerCameraTransitionRoutine = StartCoroutine(DelayedPlayerCameraTransition());
-
-                return;
-            }
+            pendingTargetTileIndex = index;
         }
 
-        IEnumerator DelayedPlayerCameraTransition()
+        public void CommitPlayerTileAfterMove()
         {
-            yield return new WaitForSeconds(playerCameraTransitionDelay);
-            EventManager.CameraEvents.OnSwitchToPlayerCamera?.Invoke();
+            currentTileIndex = pendingTargetTileIndex;
+        }
+
+        public void LogRollResultForCurrentTurn(int[] diceValues)
+        {
+            if (diceValues == null || diceValues.Length == 0)
+            {
+                return;
+            }
+
+            if (boardGenerator == null)
+            {
+                boardGenerator = BoardGenerator.Instance;
+            }
+
+            int total = CalculateTotal(diceValues);
+            string diceValuesStr = string.Join(" + ", diceValues);
+
+            Tile targetTile = boardGenerator.GetTile(currentTileIndex);
+            string tileInfo = targetTile != null ? $"Tile {currentTileIndex}" : "Unknown Tile";
+
+            if (targetTile != null && targetTile.TileData.HasReward)
+            {
+                tileInfo += $" (Reward: {targetTile.TileData.FruitTypeEnum} x{targetTile.TileData.amount})";
+            }
+
+            Debug.Log($"<color=cyan>Dice Roll: [{diceValuesStr}] = {total} → Landed on {tileInfo}</color>");
+        }
+
+        public void ApplyRewardsAtCurrentTile()
+        {
+            CheckEarnableRewards();
         }
 
         private void CheckEarnableRewards()
@@ -158,7 +150,10 @@ namespace DiceGame.Dice
             }
 
             Tile targetTile = boardGenerator.GetTile(currentTileIndex);
-            if (targetTile == null) return;
+            if (targetTile == null)
+            {
+                return;
+            }
 
             if (targetTile.TileData.HasReward)
             {
@@ -176,69 +171,15 @@ namespace DiceGame.Dice
             }
         }
 
-        private void HandlePlayerCameraTransitionCompleted()
-        {
-            if (tempDiceValues == null || tempDiceValues.Length == 0)
-            {
-                return;
-            }
-
-            int total = CalculateTotal(tempDiceValues);
-            pendingTargetTileIndex = CalculateTargetTileIndex(total);
-
-            EventManager.PlayerEvents.OnPlayerMoveRequested?.Invoke(pendingTargetTileIndex);
-        }
-
-        private void HandlePlayerMovementCompleted()
-        {
-            if (tempDiceValues == null || tempDiceValues.Length == 0)
-            {
-                return;
-            }
-
-            int total = CalculateTotal(tempDiceValues);
-            currentTileIndex = pendingTargetTileIndex;
-
-            LogRollResult(tempDiceValues, total, currentTileIndex);
-            CheckEarnableRewards();
-            tempDiceValues = null;
-
-            EventManager.GameFlowEvents.OnLevelProgressChanged?.Invoke(); // player hareketi tamamlandiginda level progress degismis olur, kaydetmek icin eventi invoke et
-        }
-
-        private void LogRollResult(int[] diceValues, int total, int targetTileIndex)
-        {
-            if (boardGenerator == null)
-            {
-                boardGenerator = BoardGenerator.Instance;
-            }
-
-            string diceValuesStr = string.Join(" + ", diceValues);
-
-            Tile targetTile = boardGenerator.GetTile(targetTileIndex);
-            string tileInfo = targetTile != null ? $"Tile {targetTileIndex}" : "Unknown Tile";
-
-            if (targetTile != null && targetTile.TileData.HasReward)
-            {
-                tileInfo += $" (Reward: {targetTile.TileData.FruitTypeEnum} x{targetTile.TileData.amount})";
-            }
-
-            Debug.Log($"<color=cyan>Dice Roll: [{diceValuesStr}] = {total} → Landed on {tileInfo}</color>");
-        }
-
         public void ResetGameplayState()
         {
             currentTileIndex = 0;
             pendingTargetTileIndex = 0;
-            diceCompetedCount = 0;
-            tempDiceValues = null;
         }
 
-        private void StopActiveGameplay()
+        public void AbortActiveTurnSession()
         {
             pendingTargetTileIndex = currentTileIndex;
-            diceCompetedCount = 0;
-            tempDiceValues = null;
         }
     }
 }

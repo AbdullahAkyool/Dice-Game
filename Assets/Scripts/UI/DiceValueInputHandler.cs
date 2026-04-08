@@ -123,7 +123,7 @@ namespace DiceGame.UI
         private void OnRollButtonClicked()
         {
             if (GameFlowController.Instance != null &&
-                GameFlowController.Instance.CurrentState != GameFlowState.Gameplay)
+                GameFlowController.Instance.CurrentStateType != GameStateType.Idle)
             {
                 return;
             }

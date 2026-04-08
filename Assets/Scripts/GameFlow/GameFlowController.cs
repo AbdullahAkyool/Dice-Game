@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DiceGame.Board;
 using DiceGame.Data;
 using DiceGame.Dice;
+using DiceGame.GameFlow.States;
 using DiceGame.Managers;
 using DiceGame.Player;
 using DiceGame.Save;
@@ -14,13 +15,15 @@ namespace DiceGame.GameFlow
     {
         public static GameFlowController Instance { get; private set; }
 
-        public GameFlowState CurrentState { get; private set; }
-        public int CurrentLevelIndex { get; private set; } = -1;
-
         [SerializeField] private DiceRollController diceRollController;
         [SerializeField] private PlayerController playerController;
+        [SerializeField] private float playerCameraTransitionDelay = 0.5f;
 
-        private bool hasInitialized;
+        private GameFlowStateMachine _stateMachine;
+        private GameSessionContext _context;
+
+        public GameStateType CurrentStateType => _stateMachine != null ? _stateMachine.CurrentType : default;
+        public int CurrentLevelIndex { get; private set; } = -1;
 
         private void Awake()
         {
@@ -33,6 +36,46 @@ namespace DiceGame.GameFlow
             Instance = this;
 
             ResolveGameplayReferences();
+            BuildStateMachine();
+        }
+
+        private void BuildStateMachine()
+        {
+            _context = new GameSessionContext
+            {
+                GameFlowController = this,
+                DiceRollController = diceRollController,
+                PlayerCameraTransitionDelay = playerCameraTransitionDelay
+            };
+
+            var levelSelection = new LevelSelectionState(_context);
+            var idle = new IdleState(_context);
+            var cameraToDice = new CameraToDiceState(_context);
+            var rolling = new RollingDiceSettledState(_context);
+            var cameraToPlayer = new CameraToPlayerState(_context);
+            var move = new MoveState(_context);
+            var resolvingTile = new ResolvingTileState(_context);
+            var turnCleanup = new TurnCleanupState(_context);
+
+            _context.LevelSelectionState = levelSelection;
+            _context.IdleState = idle;
+            _context.CameraToDiceState = cameraToDice;
+            _context.RollingDiceSettledState = rolling;
+            _context.CameraToPlayerState = cameraToPlayer;
+            _context.MoveState = move;
+            _context.ResolvingTileState = resolvingTile;
+            _context.TurnCleanupState = turnCleanup;
+
+            _stateMachine = new GameFlowStateMachine(_context);
+            _stateMachine.StateChanged += OnMachineStateChanged;
+        }
+
+        private void OnDestroy()
+        {
+            if (_stateMachine != null)
+            {
+                _stateMachine.StateChanged -= OnMachineStateChanged;
+            }
         }
 
         private void ResolveGameplayReferences()
@@ -80,32 +123,42 @@ namespace DiceGame.GameFlow
         private void Start()
         {
             ResolveGameplayReferences();
-            SetState(GameFlowState.LevelSelection);
+            _stateMachine.ChangeState(_context.LevelSelectionState);
         }
 
-        private void HandleLevelProgressChanged() // level progress kaydetmek istendiginde
+        private void Update()
+        {
+            _stateMachine?.Tick();
+        }
+
+        private void OnMachineStateChanged(GameStateType stateType)
+        {
+            EventManager.GameFlowEvents.OnStateChanged?.Invoke(stateType);
+        }
+
+        private void HandleLevelProgressChanged()
         {
             SaveCurrentLevelIfPossible();
         }
 
-        private void HandleLevelSelectedRequested(int levelIndex) // level secilmesi istendiginde
+        private void HandleLevelSelectedRequested(int levelIndex)
         {
             TransitionToLevel(levelIndex, false);
         }
 
-        private void HandleOpenLevelSelectionRequested() // level selection menu acilmasi istendiginde
+        private void HandleOpenLevelSelectionRequested()
         {
-            if (CurrentState == GameFlowState.LevelSelection)
+            if (_stateMachine != null && _stateMachine.CurrentType == GameStateType.LevelSelection)
             {
                 return;
             }
 
             SaveCurrentLevelIfPossible();
             StopActiveGameplay();
-            SetState(GameFlowState.LevelSelection);
+            _stateMachine.ChangeState(_context.LevelSelectionState);
         }
 
-        private void HandleResetCurrentLevelRequested() // mevcut level sifirlanmasi istendiginde
+        private void HandleResetCurrentLevelRequested()
         {
             if (CurrentLevelIndex < 0)
             {
@@ -116,9 +169,8 @@ namespace DiceGame.GameFlow
             TransitionToLevel(CurrentLevelIndex, true);
         }
 
-        private void TransitionToLevel(int levelIndex, bool clearProgress) // level gecisi yapmak istendiginde, clearProgress true ise mevcut save silinir
+        private void TransitionToLevel(int levelIndex, bool clearProgress)
         {
-            SetState(GameFlowState.LevelTransition);
             StopActiveGameplay();
 
             if (clearProgress)
@@ -129,7 +181,7 @@ namespace DiceGame.GameFlow
             if (BoardGenerator.Instance == null)
             {
                 Debug.LogError("BoardGenerator not found; cannot transition level.");
-                SetState(GameFlowState.LevelSelection);
+                _stateMachine.ChangeState(_context.LevelSelectionState);
                 return;
             }
 
@@ -151,11 +203,10 @@ namespace DiceGame.GameFlow
             }
 
             EventManager.DiceEvents.OnClearDiceInputs?.Invoke();
-
-            SetState(GameFlowState.Gameplay);
+            _stateMachine.ChangeState(_context.IdleState);
         }
 
-        private void ApplyLevelSaveData(LevelSaveData data) // save datasini gameplaye uygula
+        private void ApplyLevelSaveData(LevelSaveData data)
         {
             var inv = new Dictionary<FruitType, int>();
             if (data.InventoryByFruitName != null)
@@ -185,9 +236,9 @@ namespace DiceGame.GameFlow
             }
         }
 
-        private void SaveCurrentLevelIfPossible() // mevcut level kaydedilebilir durumdaysa kaydet
+        private void SaveCurrentLevelIfPossible()
         {
-            if (CurrentLevelIndex < 0 || CurrentState != GameFlowState.Gameplay)
+            if (CurrentLevelIndex < 0 || CurrentStateType == GameStateType.LevelSelection)
             {
                 return;
             }
@@ -204,24 +255,13 @@ namespace DiceGame.GameFlow
             LevelSaveService.Save(CurrentLevelIndex, data);
         }
 
-        private static void StopActiveGameplay() // aktif gameplay aktivitelerini durdur
+        public void StopActiveGameplay()
         {
             EventManager.CameraEvents.OnSnapToPlayerCameraImmediate?.Invoke();
             EventManager.DiceEvents.OnStopGameplayActivities?.Invoke();
             EventManager.PlayerEvents.OnStopPlayerMovementRequested?.Invoke();
             EventManager.DiceEvents.OnClearDiceInputs?.Invoke();
-        }
-
-        private void SetState(GameFlowState nextState) // gameplay durumunu degistir
-        {
-            if (hasInitialized && CurrentState == nextState)
-            {
-                return;
-            }
-
-            CurrentState = nextState;
-            hasInitialized = true;
-            EventManager.GameFlowEvents.OnStateChanged?.Invoke(CurrentState);
+            _context.PendingDiceValues = null;
         }
     }
 }
