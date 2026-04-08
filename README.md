@@ -1,6 +1,6 @@
 ## Dice Game Prototype
 
-### 📖 Description
+### 📖 Project Structure
 
 #### 1. State Machine Pattern (Game Flow)
 #### 2. Event-Driven Architecture (EventManager)
@@ -14,4 +14,4 @@
 
 ### 🎥 Gameplay Video
 
-### 📝 Gameplay Description
+### 🧷 Download APK
