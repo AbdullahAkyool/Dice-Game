@@ -15,3 +15,4 @@
 ### 🎥 Gameplay Video
 
 ### 🧷 Download APK
+** https://drive.google.com/drive/folders/1kPymkd9BJTHkfbvrnRyw8XV4Ch19jEBS?usp=sharing
