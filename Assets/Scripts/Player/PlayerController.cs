@@ -43,17 +43,17 @@ namespace DiceGame.Player
             animatorController.IdleAnimation();
         }
 
-        private void HandlePlayerMoveRequested(int targetTileIndex)
+        private void HandlePlayerMoveRequested(int fromTileIndex, int targetTileIndex)
         {
             if (movementCoroutine != null)
             {
                 StopCoroutine(movementCoroutine);
             }
 
-            movementCoroutine = StartCoroutine(MoveToTileCoroutine(targetTileIndex));
+            movementCoroutine = StartCoroutine(MoveToTileCoroutine(fromTileIndex, targetTileIndex));
         }
 
-        private IEnumerator MoveToTileCoroutine(int targetTileIndex)
+        private IEnumerator MoveToTileCoroutine(int fromTileIndex, int targetTileIndex)
         {
             if (boardGenerator == null)
             {
@@ -67,6 +67,16 @@ namespace DiceGame.Player
                 movementCoroutine = null;
                 EventManager.PlayerEvents.OnPlayerMovementCompleted?.Invoke();
                 yield break;
+            }
+
+            if (targetTileIndex < fromTileIndex)
+            {
+                int wrapRestartTileIndex =
+                    boardGenerator != null && boardGenerator.TileCount > BoardGenerator.FirstPlayableTileBoardIndex
+                        ? BoardGenerator.FirstPlayableTileBoardIndex
+                        : BoardGenerator.StartTileBoardIndex;
+
+                PlaceOnTileIndex(wrapRestartTileIndex);
             }
 
             Vector3 targetPosition = targetTile.GetPlayerPosition();
@@ -121,10 +131,16 @@ namespace DiceGame.Player
                 boardGenerator = BoardGenerator.Instance;
             }
 
+            PlaceOnTileIndex(tileIndex);
+            animatorController.IdleAnimation();
+        }
+
+        private void PlaceOnTileIndex(int tileIndex)
+        {
             Tile tile = boardGenerator != null ? boardGenerator.GetTile(tileIndex) : null;
             if (tile == null)
             {
-                Debug.LogWarning($"TeleportToTile: tile {tileIndex} not found.");
+                Debug.LogWarning($"PlaceOnTileIndex: tile {tileIndex} not found.");
                 return;
             }
 
@@ -132,8 +148,6 @@ namespace DiceGame.Player
             targetPosition.x = transform.position.x;
             targetPosition.y = transform.position.y;
             transform.position = targetPosition;
-
-            animatorController.IdleAnimation();
         }
     }
 }

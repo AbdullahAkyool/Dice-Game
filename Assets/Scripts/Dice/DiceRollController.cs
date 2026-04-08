@@ -97,8 +97,7 @@ namespace DiceGame.Dice
                 boardGenerator = BoardGenerator.Instance;
             }
 
-            int newIndex = currentTileIndex + steps;
-            return boardGenerator.GetWrappedIndex(newIndex);
+            return boardGenerator.GetWrappedPlayableIndex(currentTileIndex, steps);
         }
 
         public void SetPendingTargetTileIndex(int index)
@@ -127,9 +126,11 @@ namespace DiceGame.Dice
             string diceValuesStr = string.Join(" + ", diceValues);
 
             Tile targetTile = boardGenerator.GetTile(currentTileIndex);
-            string tileInfo = targetTile != null ? $"Tile {currentTileIndex}" : "Unknown Tile";
+            string tileInfo = DescribeLandingTile(targetTile, currentTileIndex);
 
-            if (targetTile != null && targetTile.TileData.HasReward)
+            if (targetTile != null
+                && !BoardGenerator.IsStartTileIndex(currentTileIndex)
+                && targetTile.TileData.HasReward)
             {
                 tileInfo += $" (Reward: {targetTile.TileData.FruitTypeEnum} x{targetTile.TileData.amount})";
             }
@@ -142,11 +143,31 @@ namespace DiceGame.Dice
             CheckEarnableRewards();
         }
 
+        private static string DescribeLandingTile(Tile tile, int boardIndex)
+        {
+            if (tile == null)
+            {
+                return "Unknown Tile";
+            }
+
+            if (BoardGenerator.IsStartTileIndex(boardIndex))
+            {
+                return "START";
+            }
+
+            return $"Tile {boardIndex}";
+        }
+
         private void CheckEarnableRewards()
         {
             if (boardGenerator == null)
             {
                 boardGenerator = BoardGenerator.Instance;
+            }
+
+            if (BoardGenerator.IsStartTileIndex(currentTileIndex))
+            {
+                return;
             }
 
             Tile targetTile = boardGenerator.GetTile(currentTileIndex);

@@ -1758,6 +1758,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   diceRollController: {fileID: 294495726}
   playerController: {fileID: 1837143324}
+  playerCameraTransitionDelay: 0.5
 --- !u!4 &873663822
 Transform:
   m_ObjectHideFlags: 0
@@ -4358,6 +4359,9 @@ MonoBehaviour:
   gameplayPanel: {fileID: 404178444}
   resetButton: {fileID: 286865770}
   menuButton: {fileID: 428908405}
+  diceElementsHolder:
+  - {fileID: 1592891147}
+  - {fileID: 1698553506}
 --- !u!4 &2134239642
 Transform:
   m_ObjectHideFlags: 0

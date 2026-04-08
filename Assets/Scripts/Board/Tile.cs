@@ -16,17 +16,30 @@ namespace DiceGame.Board
 
         public int TileIndex { get; private set; }
         public TileData TileData { get; private set; }
+        public bool IsStartTile { get; private set; }
 
-        public void Initialize(TileData tileData)
+        public void Initialize(TileData tileData, int boardIndex)
         {
             TileData = tileData;
-            TileIndex = tileData.index;
+            TileIndex = boardIndex;
+            IsStartTile = BoardGenerator.IsStartTileIndex(boardIndex);
 
             UpdateVisuals();
         }
 
         private void UpdateVisuals()
         {
+            if (IsStartTile)
+            {
+                if (tileNumberText != null)
+                {
+                    tileNumberText.text = "START";
+                }
+
+                ClearRewardVisuals();
+                return;
+            }
+
             if (tileNumberText != null)
             {
                 tileNumberText.text = TileIndex.ToString();
@@ -45,24 +58,26 @@ namespace DiceGame.Board
             }
             else
             {
-                if (rewardCountText != null)
-                {
-                    rewardCountText.text = "";
-                }
-
-                if (rewardIcon != null)
-                {
-                    rewardIcon.enabled = false;
-                }
+                ClearRewardVisuals();
             }
         }
 
-        private void Reset()
+        private void ClearRewardVisuals()
         {
             if (rewardCountText != null)
             {
                 rewardCountText.text = "";
             }
+
+            if (rewardIcon != null)
+            {
+                rewardIcon.enabled = false;
+            }
+        }
+
+        private void ClearForPool()
+        {
+            ClearRewardVisuals();
         }
 
         private Sprite GetFruitIcon(FruitType fruitType)
@@ -88,7 +103,7 @@ namespace DiceGame.Board
 
         public void OnDespawn()
         {
-            Reset();
+            ClearForPool();
             gameObject.SetActive(false);
         }
     }

@@ -22,6 +22,11 @@ namespace DiceGame.Board
         public int TileCount => tiles.Count;
         public int CurrentLevelIndex => levelIndex;
 
+        public const int StartTileBoardIndex = 0;
+        public const int FirstPlayableTileBoardIndex = 1;
+
+        public static bool IsStartTileIndex(int boardIndex) => boardIndex == StartTileBoardIndex;
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -98,13 +103,11 @@ namespace DiceGame.Board
             {
                 Vector3 position = new Vector3(0, 0, index * spawnOffset);
                 spawnedTile.name = $"Tile_{index}";
-                spawnedTile.Initialize(tileData);
+                spawnedTile.Initialize(tileData, index);
                 spawnedTile.transform.position = position;
                 spawnedTile.transform.rotation = Quaternion.identity;
                 spawnedTile.transform.SetParent(boardParent, false);
                 tiles.Add(spawnedTile);
-
-                TrySpawnRewardFruit(tileData, spawnedTile);
             }
             else
             {
@@ -131,17 +134,6 @@ namespace DiceGame.Board
             tiles.Clear();
         }
 
-        private void TrySpawnRewardFruit(TileData tileData, Tile spawnedTile)
-        {
-            if (!tileData.HasReward || DatabaseManager.Instance.FruitDatabase == null)
-            {
-                return;
-            }
-
-
-
-        }
-
         public Tile GetTile(int index)
         {
             if (index >= 0 && index < tiles.Count)
@@ -155,6 +147,27 @@ namespace DiceGame.Board
         {
             if (tiles.Count == 0) return 0;
             return index % tiles.Count;
+        }
+
+        public int GetWrappedPlayableIndex(int currentTileIndex, int steps)
+        {
+            if (tiles.Count <= 1)
+            {
+                return StartTileBoardIndex;
+            }
+
+            if (steps <= 0)
+            {
+                return Mathf.Clamp(currentTileIndex, StartTileBoardIndex, tiles.Count - 1);
+            }
+
+            int playableTileCount = tiles.Count - 1;
+            int clampedCurrentIndex = Mathf.Clamp(currentTileIndex, StartTileBoardIndex, tiles.Count - 1);
+            int currentProgressIndex = IsStartTileIndex(clampedCurrentIndex)
+                ? 0
+                : clampedCurrentIndex;
+
+            return ((currentProgressIndex + steps - 1) % playableTileCount) + FirstPlayableTileBoardIndex;
         }
     }
 }
