@@ -3,6 +3,8 @@ using DiceGame.Managers;
 using DiceGame.Board;
 using DiceGame.Data;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using System.Collections;
 
 namespace DiceGame.Dice
 {
@@ -12,13 +14,16 @@ namespace DiceGame.Dice
         private BoardGenerator boardGenerator;
 
         private int currentTileIndex = 0;
+        public int CurrentTileIndex => currentTileIndex;
+
         private int pendingTargetTileIndex = 0;
 
         private int[] tempDiceValues;
         [SerializeField] private List<DiceController> diceControllers;
         private int diceCompetedCount = 0;
 
-        public int CurrentTileIndex => currentTileIndex;
+        [SerializeField] private float playerCameraTransitionDelay = 0.5f;
+        private Coroutine playerCameraTransitionRoutine;
 
         public void ApplyTileIndexFromSave(int tileIndex) // save dosyasindan gelen tile indexini uygula
         {
@@ -128,9 +133,21 @@ namespace DiceGame.Dice
             if (diceCompetedCount >= diceControllers.Count)
             {
                 diceCompetedCount = 0;
-                EventManager.CameraEvents.OnSwitchToPlayerCamera?.Invoke();
+
+                if (playerCameraTransitionRoutine != null)
+                {
+                    StopCoroutine(playerCameraTransitionRoutine);
+                }
+                playerCameraTransitionRoutine = StartCoroutine(DelayedPlayerCameraTransition());
+
                 return;
             }
+        }
+
+        IEnumerator DelayedPlayerCameraTransition()
+        {
+            yield return new WaitForSeconds(playerCameraTransitionDelay);
+            EventManager.CameraEvents.OnSwitchToPlayerCamera?.Invoke();
         }
 
         private void CheckEarnableRewards()
