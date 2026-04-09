@@ -13,9 +13,9 @@
 ** Open the project in Unity 6000.0.X or Download the APK from the link below.
 
 ### 🎥 Gameplay Video
-https://github.com/user-attachments/assets/d8d4b47d-22ab-494c-8b45-890d51ca1a81
+https://github.com/user-attachments/assets/a81c677c-fb22-46b0-a52d-97dabe383d98
 
-https://github.com/user-attachments/assets/8d47030f-e283-4d1a-890c-62307b3cb413
+https://github.com/user-attachments/assets/8cd71555-fe44-4671-8924-cba9930c2423
 
 ### 🧷 Download APK
-** https://drive.google.com/drive/folders/1kPymkd9BJTHkfbvrnRyw8XV4Ch19jEBS?usp=sharing
+** https://drive.google.com/file/d/1PlaVjsrxsMX0PCSOmiPTYFyG6bMfEZCs/view?usp=sharing
