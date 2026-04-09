@@ -43,62 +43,75 @@ namespace DiceGame.Player
             animatorController.IdleAnimation();
         }
 
-        private void HandlePlayerMoveRequested(int fromTileIndex, int targetTileIndex)
+        private void HandlePlayerMoveRequested(int fromTileIndex, int steps)
         {
             if (movementCoroutine != null)
             {
                 StopCoroutine(movementCoroutine);
             }
 
-            movementCoroutine = StartCoroutine(MoveToTileCoroutine(fromTileIndex, targetTileIndex));
+            movementCoroutine = StartCoroutine(MoveToTileCoroutine(fromTileIndex, steps));
         }
 
-        private IEnumerator MoveToTileCoroutine(int fromTileIndex, int targetTileIndex)
+        private IEnumerator MoveToTileCoroutine(int fromTileIndex, int steps)
         {
             if (boardGenerator == null)
             {
                 boardGenerator = BoardGenerator.Instance;
             }
 
-            Tile targetTile = boardGenerator != null ? boardGenerator.GetTile(targetTileIndex) : null;
-            if (targetTile == null)
+            if (boardGenerator == null)
             {
-                Debug.LogWarning($"Target tile {targetTileIndex} not found.");
                 movementCoroutine = null;
                 EventManager.PlayerEvents.OnPlayerMovementCompleted?.Invoke();
                 yield break;
             }
 
-            if (targetTileIndex < fromTileIndex)
+            animatorController.RunAnimation();
+
+            int currentTileIndex = fromTileIndex;
+
+            for (int i = 0; i < steps; i++)
             {
-                int wrapRestartTileIndex =
-                    boardGenerator != null && boardGenerator.TileCount > BoardGenerator.FirstPlayableTileBoardIndex
+                int nextTileIndex = boardGenerator.GetWrappedPlayableIndex(currentTileIndex, 1);
+                Tile nextTile = boardGenerator.GetTile(nextTileIndex);
+
+                if (nextTile == null)
+                {
+                    Debug.LogWarning($"Target tile {nextTileIndex} not found.");
+                    break;
+                }
+
+                if (nextTileIndex < currentTileIndex)
+                {
+                    int wrapRestartTileIndex = boardGenerator.TileCount > BoardGenerator.FirstPlayableTileBoardIndex
                         ? BoardGenerator.FirstPlayableTileBoardIndex
                         : BoardGenerator.StartTileBoardIndex;
 
-                PlaceOnTileIndex(wrapRestartTileIndex);
-            }
+                    PlaceOnTileIndex(wrapRestartTileIndex);
+                }
 
-            Vector3 targetPosition = targetTile.GetPlayerPosition();
-            targetPosition.x = transform.position.x;
-            targetPosition.y = transform.position.y;
+                Vector3 targetPosition = nextTile.GetPlayerPosition();
+                targetPosition.x = transform.position.x;
+                targetPosition.y = transform.position.y;
 
-            animatorController.RunAnimation();
+                while (Mathf.Abs(targetPosition.z - transform.position.z) > stopDistance)
+                {
+                    Vector3 pos = transform.position;
+                    pos.z = Mathf.MoveTowards(pos.z, targetPosition.z, moveSpeed * Time.deltaTime);
+                    transform.position = pos;
 
-            while (Mathf.Abs(targetPosition.z - transform.position.z) > stopDistance)
-            {
-                Vector3 pos = transform.position;
-                pos.z = Mathf.MoveTowards(pos.z, targetPosition.z, moveSpeed * Time.deltaTime);
-                transform.position = pos;
+                    yield return null;
+                }
 
-                yield return null;
+                Vector3 finalPosition = transform.position;
+                finalPosition.z = targetPosition.z;
+                transform.position = finalPosition;
+
+                currentTileIndex = nextTileIndex;
             }
 
             animatorController.IdleAnimation();
-
-            Vector3 finalPosition = transform.position;
-            finalPosition.z = targetPosition.z;
-            transform.position = finalPosition;
 
             movementCoroutine = null;
 

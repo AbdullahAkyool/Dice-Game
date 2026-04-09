@@ -30,13 +30,13 @@ namespace DiceGame.GameFlow.States
 
             int fromTile = _ctx.DiceRollController.CurrentTileIndex;
 
-            EventManager.PlayerEvents.OnPlayerMovementCompleted += OnMovementCompleted;
-            EventManager.PlayerEvents.OnPlayerMoveRequested?.Invoke(fromTile, target);
-
             if(UIManager.Instance != null)
             {
                 UIManager.Instance.SetDiceElementsActive(false);
             }
+
+            EventManager.PlayerEvents.OnPlayerMovementCompleted += OnMovementCompleted;
+            EventManager.PlayerEvents.OnPlayerMoveRequested?.Invoke(fromTile, total);
         }
 
         public void OnUpdate(GameFlowStateMachine machine)
