@@ -1,4 +1,5 @@
 using DiceGame.GameFlow;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,6 +20,9 @@ namespace DiceGame.Managers
         [Header("Dice Elements Holder")]
         [SerializeField] private GameObject[] diceElementsHolder;
 
+        [Header("UI Elements")]
+        [SerializeField] private TMP_Text currentLevelText;
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -36,6 +40,11 @@ namespace DiceGame.Managers
             if (menuButton != null)
             {
                 menuButton.onClick.AddListener(OpenLevelMenu);
+            }
+
+            if (currentLevelText != null)
+            {
+                currentLevelText.text = "";
             }
         }
 
@@ -55,11 +64,13 @@ namespace DiceGame.Managers
         private void OnEnable()
         {
             EventManager.GameFlowEvents.OnStateChanged += HandleStateChanged;
+            EventManager.GameFlowEvents.OnLevelSelectedRequested += SetCurrentLevelText;
         }
 
         private void OnDisable()
         {
             EventManager.GameFlowEvents.OnStateChanged -= HandleStateChanged;
+            EventManager.GameFlowEvents.OnLevelSelectedRequested -= SetCurrentLevelText;
         }
 
         private void Start()
@@ -105,6 +116,14 @@ namespace DiceGame.Managers
                 {
                     holder.SetActive(active);
                 }
+            }
+        }
+
+        public void SetCurrentLevelText(int level)
+        {
+            if (currentLevelText != null)
+            {
+                currentLevelText.text = $"Level {level + 1}";
             }
         }
 
